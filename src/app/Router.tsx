@@ -8,6 +8,7 @@ import TasksPage from "./routes/Tasks";
 import Login from "./routes/Login";
 import NotFound from "./NotFound";
 import ProtectedRoute from "./ProtectedRoute";
+import Debug from "../pages/Debug";
 
 export default function AppRouter(){
   return (
@@ -20,6 +21,7 @@ export default function AppRouter(){
           <Route path={ROUTES.clients} element={<AppShell><ClientsPage /></AppShell>} />
           <Route path={ROUTES.projects} element={<AppShell><ProjectsPage /></AppShell>} />
           <Route path={ROUTES.tasks} element={<AppShell><TasksPage /></AppShell>} />
+          <Route path={ROUTES.debug} element={<AppShell><Debug /></AppShell>} />
         </Route>
         <Route path="*" element={<NotFound/>} />
       </Routes>

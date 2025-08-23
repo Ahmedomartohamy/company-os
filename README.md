@@ -87,8 +87,22 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
 ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium';
 ```
 
+### إضافة بيانات تجريبية (Seeding):
+لإضافة بيانات تجريبية للتطوير والاختبار:
+
+1. افتح Supabase Dashboard
+2. اذهب إلى SQL Editor
+3. انسخ محتوى ملف `supabase/SEED.sql`
+4. الصق المحتوى واضغط "Run"
+
+سيتم إضافة:
+- ~10 عملاء تجريبيين
+- ~5 مشاريع مرتبطة بالعملاء
+- ~20 مهمة مرتبطة بالمشاريع
+
 ### ملفات مهمة تم إنشاؤها:
 - `.gitignore`: لحماية الملفات الحساسة
 - `vercel.json`: تكوين النشر على Vercel
 - `update-projects-schema.sql`: تحديثات قاعدة بيانات المشاريع
 - `update-tasks-schema.sql`: تحديثات قاعدة بيانات المهام
+- `supabase/SEED.sql`: بيانات تجريبية للتطوير والاختبار
