@@ -8,6 +8,8 @@ export const OpportunitySchema = z.object({
   client_id: z.string().uuid('معرف العميل مطلوب'),
   stage_id: z.string().uuid('مرحلة الفرصة مطلوبة'),
   amount: z.number().min(0, 'المبلغ يجب أن يكون أكبر من أو يساوي صفر').optional(),
+  currency: z.string().default('EGP'),
+  status: z.enum(['open', 'won', 'lost']).default('open'),
   probability: z.number().min(0, 'الاحتمالية يجب أن تكون أكبر من أو تساوي 0').max(100, 'الاحتمالية يجب أن تكون أقل من أو تساوي 100').default(0),
   close_date: z.string().optional(),
   owner_id: z.string().uuid().optional(),
@@ -47,6 +49,10 @@ export interface OpportunityWithDetails extends Opportunity {
     name: string;
     probability: number;
   };
+  owner?: {
+    id: string;
+    full_name: string;
+  };
 }
 
 // Opportunity filters interface
@@ -60,6 +66,12 @@ export interface OpportunityFilters {
   page?: number; // Page number (1-based)
   limit?: number; // Items per page
 }
+
+// Type alias for list opportunities parameters
+export type ListOpportunitiesParams = OpportunityFilters & {
+  contactId?: string;
+  status?: string;
+};
 
 const OPPORTUNITIES_TABLE = 'opportunities';
 const PIPELINES_TABLE = 'pipelines';

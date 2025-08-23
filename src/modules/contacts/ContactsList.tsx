@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -51,15 +51,19 @@ export default function ContactsList({
       ownerId: selectedOwnerId || undefined,
       page,
       limit: 25
-    }),
-    onSuccess: (newContacts) => {
+    })
+  }) as { data: ContactWithClient[], isLoading: boolean, isFetching: boolean };
+
+  // Handle data updates when contacts change
+  useEffect(() => {
+    if (contacts) {
       if (page === 1) {
-        setAllContacts(newContacts);
+        setAllContacts(contacts);
       } else {
-        setAllContacts(prev => [...prev, ...newContacts]);
+        setAllContacts(prev => [...prev, ...contacts]);
       }
     }
-  });
+  }, [contacts, page]);
 
   // Reset pagination when filters change
   const resetPagination = () => {

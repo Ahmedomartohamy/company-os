@@ -34,8 +34,8 @@ export default function ConvertLeadDialog({
 
   // Fetch clients for selection
   const { data: clients = [] } = useQuery({
-    queryKey: ['clients', { q: clientSearchQuery }],
-    queryFn: () => listClients({ q: clientSearchQuery || undefined }),
+    queryKey: ['clients'],
+    queryFn: listClients,
     enabled: !createNewClient
   });
 
@@ -69,7 +69,7 @@ export default function ConvertLeadDialog({
     }
 
     // Check permissions
-    if (!can('convert', 'leads', lead)) {
+    if (!can('update', 'leads', lead)) {
       toast.error('ليس لديك صلاحية لتحويل هذا العميل المحتمل');
       return;
     }

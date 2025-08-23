@@ -22,7 +22,8 @@ import {
   getPipeline, 
   moveOpportunityStage, 
   OpportunityWithDetails,
-  Stage 
+  Stage,
+  Pipeline 
 } from '@/lib/opportunities';
 import { useAuthz } from '@/lib/useAuthz';
 import Modal from '@/components/ui/Modal';
@@ -37,6 +38,7 @@ interface StageColumnProps {
   onLoadMore?: () => void;
   hasMore?: boolean;
   isLoading?: boolean;
+  movingOpportunities: Set<string>;
 }
 
 function StageColumn({ 
@@ -46,7 +48,8 @@ function StageColumn({
   onDeleteOpportunity,
   onLoadMore,
   hasMore,
-  isLoading
+  isLoading,
+  movingOpportunities
 }: StageColumnProps) {
   const { can } = useAuthz();
   const canCreate = can('create', 'opportunities');
@@ -154,25 +157,27 @@ export function OpportunitiesBoard() {
     data: pipeline, 
     isLoading, 
     error 
-  } = useQuery({
+  } = useQuery<Pipeline | null>({
     queryKey: ['pipeline', pipelineId, page],
     queryFn: () => getPipeline(pipelineId!, page, 25),
-    enabled: !!pipelineId,
-    onSuccess: (data) => {
-      if (data?.stages) {
-        setAllOpportunities(prev => {
-          const newMap = new Map(prev);
-          data.stages.forEach(stage => {
-            const stageId = stage.id;
-            const existingOpps = page === 1 ? [] : (newMap.get(stageId) || []);
-            const newOpps = stage.opportunities || [];
-            newMap.set(stageId, [...existingOpps, ...newOpps]);
-          });
-          return newMap;
-        });
-      }
-    }
+    enabled: !!pipelineId
   });
+
+  // Handle data updates when pipeline data changes
+  React.useEffect(() => {
+    if (pipeline?.stages) {
+      setAllOpportunities(prev => {
+        const newMap = new Map(prev);
+        (pipeline as unknown as Pipeline).stages.forEach((stage: Stage & { opportunities?: OpportunityWithDetails[] }) => {
+          const stageId = stage.id;
+          const existingOpps = page === 1 ? [] : (newMap.get(stageId) || []);
+          const newOpps = stage.opportunities || [];
+          newMap.set(stageId, [...existingOpps, ...newOpps]);
+        });
+        return newMap;
+      });
+    }
+  }, [pipeline, page]);
 
   // Mutation for moving opportunities with optimistic updates
   const moveOpportunityMutation = useMutation({
@@ -212,9 +217,9 @@ export function OpportunitiesBoard() {
 
   // Group opportunities by stage with optimistic moves
   const stagesWithOpportunities = useMemo(() => {
-    if (!pipeline?.stages) return [];
+    if (!(pipeline as unknown as Pipeline)?.stages) return [];
     
-    return pipeline.stages.map(stage => {
+    return (pipeline as unknown as Pipeline).stages.map((stage: Stage) => {
       const stageOpportunities = allOpportunities.get(stage.id) || [];
       
       // Apply optimistic moves
@@ -224,10 +229,10 @@ export function OpportunitiesBoard() {
       });
       
       // Add opportunities moved to this stage
-      const movedToThisStage = pipeline.stages
-        .filter(s => s.id !== stage.id)
-        .flatMap(s => allOpportunities.get(s.id) || [])
-        .filter(opp => {
+      const movedToThisStage = (pipeline as unknown as Pipeline).stages
+        .filter((s: Stage) => s.id !== stage.id)
+        .flatMap((s: Stage) => allOpportunities.get(s.id) || [])
+        .filter((opp: OpportunityWithDetails) => {
           const optimisticMove = optimisticMoves.get(opp.id!);
           return optimisticMove && optimisticMove.toStageId === stage.id;
         });
@@ -251,7 +256,7 @@ export function OpportunitiesBoard() {
   };
 
   // Check if there are more opportunities to load
-  const hasMore = pipeline?.stages.some(stage => {
+  const hasMore = (pipeline as unknown as Pipeline)?.stages.some((stage: Stage) => {
     const currentOpps = allOpportunities.get(stage.id) || [];
     const latestOpps = stage.opportunities || [];
     return latestOpps.length === 25; // If we got exactly 25, there might be more
@@ -262,8 +267,8 @@ export function OpportunitiesBoard() {
     
     // Find the opportunity being dragged
     const opportunity = stagesWithOpportunities
-      .flatMap(stage => stage.opportunities)
-      .find(opp => opp.id === active.id);
+      .flatMap((stage: Stage & { opportunities: OpportunityWithDetails[] }) => stage.opportunities)
+      .find((opp: OpportunityWithDetails) => opp.id === active.id);
     
     if (opportunity) {
       setActiveOpportunity(opportunity);
@@ -281,8 +286,8 @@ export function OpportunitiesBoard() {
     
     // Find the opportunity being moved
     const opportunity = stagesWithOpportunities
-      .flatMap(stage => stage.opportunities)
-      .find(opp => opp.id === opportunityId);
+      .flatMap((stage: Stage & { opportunities: OpportunityWithDetails[] }) => stage.opportunities)
+      .find((opp: OpportunityWithDetails) => opp.id === opportunityId);
     
     if (!opportunity) return;
     
@@ -369,9 +374,9 @@ export function OpportunitiesBoard() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{pipeline.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{(pipeline as unknown as Pipeline)?.name}</h1>
             <p className="text-gray-600 mt-1">
-              {stagesWithOpportunities.reduce((total, stage) => total + stage.opportunities.length, 0)} فرصة تجارية
+              {stagesWithOpportunities.reduce((total: number, stage: Stage & { opportunities: OpportunityWithDetails[] }) => total + stage.opportunities.length, 0)} فرصة تجارية
             </p>
           </div>
           
@@ -396,7 +401,7 @@ export function OpportunitiesBoard() {
           onDragEnd={handleDragEnd}
         >
           <div className="flex gap-6 min-w-max">
-            {stagesWithOpportunities.map((stage) => (
+            {stagesWithOpportunities.map((stage: Stage & { opportunities: OpportunityWithDetails[] }) => (
               <StageColumn
                 key={stage.id}
                 stage={stage}
@@ -406,6 +411,7 @@ export function OpportunitiesBoard() {
                 onLoadMore={loadMore}
                 hasMore={hasMore}
                 isLoading={isLoading}
+                movingOpportunities={movingOpportunities}
               />
             ))}
           </div>
@@ -434,13 +440,12 @@ export function OpportunitiesBoard() {
 
       {/* Create Opportunity Modal */}
       <Modal
-        isOpen={showCreateForm}
+        open={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         title="إضافة فرصة جديدة"
-        size="lg"
       >
         <OpportunityForm
-          stages={pipeline?.stages || []}
+          stages={(pipeline as unknown as Pipeline)?.stages || []}
           onSuccess={() => setShowCreateForm(false)}
           onCancel={() => setShowCreateForm(false)}
         />

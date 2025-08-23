@@ -42,17 +42,15 @@ export function OpportunityForm({
 
   // Form validation
   const form = useFormZod(OpportunitySchema, {
-    defaultValues: {
-      name: opportunity?.name || '',
-      client_id: opportunity?.client_id || '',
-      stage_id: opportunity?.stage_id || defaultStageId || '',
-      amount: opportunity?.amount || 0,
-      probability: opportunity?.probability || 0,
-      close_date: opportunity?.close_date || '',
-      owner_id: opportunity?.owner_id || user?.id || '',
-      contact_id: opportunity?.contact_id || '',
-      notes: opportunity?.notes || ''
-    }
+    name: opportunity?.name || '',
+    client_id: opportunity?.client_id || '',
+    stage_id: opportunity?.stage_id || defaultStageId || '',
+    amount: opportunity?.amount || 0,
+    probability: opportunity?.probability || 0,
+    close_date: opportunity?.close_date || '',
+    owner_id: opportunity?.owner_id || user?.id || '',
+    contact_id: opportunity?.contact_id || '',
+    notes: opportunity?.notes || ''
   });
 
   // Fetch clients for dropdown
@@ -74,8 +72,7 @@ export function OpportunityForm({
     mutationFn: (data: Opportunity) => createOpportunity(data, user?.id),
     onSuccess: () => {
       toast.success('تم إنشاء الفرصة بنجاح');
-      // Invalidate pipeline and opportunities queries
-      queryClient.invalidateQueries({ queryKey: ['pipeline', pipelineId] });
+      // Invalidate opportunities queries
       queryClient.invalidateQueries({ queryKey: ['opportunities'] });
       onSuccess?.();
     },
@@ -91,8 +88,7 @@ export function OpportunityForm({
       updateOpportunity(id, data),
     onSuccess: (_, { id }) => {
       toast.success('تم تحديث الفرصة بنجاح');
-      // Invalidate pipeline and opportunity queries
-      queryClient.invalidateQueries({ queryKey: ['pipeline', pipelineId] });
+      // Invalidate opportunity queries
       queryClient.invalidateQueries({ queryKey: ['opportunity', id] });
       queryClient.invalidateQueries({ queryKey: ['opportunities'] });
       onSuccess();
@@ -156,8 +152,8 @@ export function OpportunityForm({
         <Select
           label="العميل *"
           placeholder="اختر العميل"
-          options={clients.map(client => ({
-            value: client.id,
+          options={clients.filter(client => client.id).map(client => ({
+            value: client.id!,
             label: client.name
           }))}
           {...form.register('client_id')}

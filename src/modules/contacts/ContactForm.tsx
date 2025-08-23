@@ -31,16 +31,14 @@ export default function ContactForm({
 
   // Form validation
   const form = useFormZod(ContactSchema, {
-    defaultValues: {
-      first_name: contact?.first_name || '',
-      last_name: contact?.last_name || '',
-      email: contact?.email || '',
-      phone: contact?.phone || '',
-      company: contact?.company || '',
-      position: contact?.position || '',
-      client_id: contact?.client_id || defaultClientId || '',
-      notes: contact?.notes || ''
-    }
+    first_name: contact?.first_name || '',
+    last_name: contact?.last_name || '',
+    email: contact?.email || '',
+    phone: contact?.phone || '',
+    company: contact?.company || '',
+    position: contact?.position || '',
+    client_id: contact?.client_id || defaultClientId || '',
+    notes: contact?.notes || ''
   });
 
   // Fetch clients for dropdown
@@ -60,9 +58,13 @@ export default function ContactForm({
       const optimisticContact: ContactWithClient = {
         ...newContact,
         id: `temp-${Date.now()}`, // Temporary ID
+        first_name: newContact.first_name || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        client: clients.find(c => c.id === newContact.client_id) || undefined
+        client: (() => {
+          const foundClient = clients.find(c => c.id === newContact.client_id);
+          return foundClient ? { id: foundClient.id!, name: foundClient.name } : undefined;
+        })()
       };
       
       // Add to all relevant queries

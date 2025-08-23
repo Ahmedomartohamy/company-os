@@ -28,17 +28,15 @@ export default function LeadForm({
 
   // Form validation
   const form = useFormZod(LeadSchema, {
-    defaultValues: {
-      first_name: lead?.first_name || '',
-      last_name: lead?.last_name || '',
-      company: lead?.company || '',
-      email: lead?.email || '',
-      phone: lead?.phone || '',
-      source: lead?.source || 'other',
-      status: lead?.status || 'new',
-      score: lead?.score || 0,
-      notes: lead?.notes || ''
-    }
+    first_name: lead?.first_name || '',
+    last_name: lead?.last_name || '',
+    company: lead?.company || '',
+    email: lead?.email || '',
+    phone: lead?.phone || '',
+    source: lead?.source || 'other',
+    status: lead?.status || 'new',
+    score: lead?.score || 0,
+    notes: lead?.notes || ''
   });
 
   // Create mutation with optimistic updates

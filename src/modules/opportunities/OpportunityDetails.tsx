@@ -342,7 +342,7 @@ export function OpportunityDetails() {
       {showEditForm && (
         <OpportunityForm
           opportunity={opportunity}
-          onClose={() => setShowEditForm(false)}
+          onCancel={() => setShowEditForm(false)}
           onSuccess={() => {
             setShowEditForm(false);
             loadOpportunity();

@@ -8,29 +8,20 @@ export default function Dashboard() {
   // Query for pipeline value
   const { data: pipelineData, isLoading: pipelineLoading, error: pipelineError } = useQuery({
     queryKey: ['dashboard', 'pipeline-value'],
-    queryFn: getPipelineValue,
-    onError: (error: Error) => {
-      toast.error(`خطأ في تحميل قيمة البايبلاين: ${error.message}`);
-    }
-  });
+    queryFn: getPipelineValue
+  }) as { data: { pipeline_value: number } | undefined, isLoading: boolean, error: Error | null };
 
   // Query for expected revenue
   const { data: revenueData, isLoading: revenueLoading, error: revenueError } = useQuery({
     queryKey: ['dashboard', 'expected-revenue'],
-    queryFn: getExpectedRevenue,
-    onError: (error: Error) => {
-      toast.error(`خطأ في تحميل الإيراد المتوقع: ${error.message}`);
-    }
-  });
+    queryFn: getExpectedRevenue
+  }) as { data: { expected_revenue: number } | undefined, isLoading: boolean, error: Error | null };
 
   // Query for tasks due
   const { data: tasksData, isLoading: tasksLoading, error: tasksError } = useQuery({
     queryKey: ['dashboard', 'tasks-due'],
-    queryFn: getTasksDue,
-    onError: (error: Error) => {
-      toast.error(`خطأ في تحميل المهام المستحقة: ${error.message}`);
-    }
-  });
+    queryFn: getTasksDue
+  }) as { data: { due_today: number, due_tomorrow: number } | undefined, isLoading: boolean, error: Error | null };
 
   // Helper function to format currency
   const formatCurrency = (amount: number) => {

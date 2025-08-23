@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -42,7 +42,7 @@ export default function LeadsList({
   
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { can, user } = useAuthz();
+  const { can } = useAuthz();
 
   // Fetch leads with filters and pagination
   const { data: leads = [], isLoading, isFetching } = useQuery({
@@ -54,15 +54,19 @@ export default function LeadsList({
       ownerId: selectedOwnerId || undefined,
       page,
       limit: 25
-    }),
-    onSuccess: (newLeads) => {
+    })
+  }) as { data: LeadWithOwner[], isLoading: boolean, isFetching: boolean };
+
+  // Handle data updates when leads change
+  useEffect(() => {
+    if (leads) {
       if (page === 1) {
-        setAllLeads(newLeads);
+        setAllLeads(leads);
       } else {
-        setAllLeads(prev => [...prev, ...newLeads]);
+        setAllLeads(prev => [...prev, ...leads]);
       }
     }
-  });
+  }, [leads, page]);
 
   // Reset pagination when filters change
   const resetPagination = () => {
@@ -161,7 +165,7 @@ export default function LeadsList({
   };
 
   const handleConvert = (lead: LeadWithOwner) => {
-    if (can('convert', 'leads', lead)) {
+    if (can('update', 'leads', lead)) {
       setLeadToConvert(lead);
       setShowConvertDialog(true);
     }
@@ -274,7 +278,7 @@ export default function LeadsList({
         searchableKeys={[]} // Disable local search since we have server-side search
         columns={[
           {
-            key: 'name',
+            key: 'first_name',
             header: 'الاسم',
             render: (lead: LeadWithOwner) => (
               <div>
@@ -341,7 +345,7 @@ export default function LeadsList({
                     <Pencil className="w-4 h-4" />
                   </Button>
                 )}
-                {can('convert', 'leads', lead) && lead.status !== 'qualified' && (
+                {can('update', 'leads', lead) && lead.status !== 'qualified' && (
                   <Button
                     variant="outline"
                     size="sm"
