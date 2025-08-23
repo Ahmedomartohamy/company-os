@@ -100,6 +100,22 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium'
 - ~5 مشاريع مرتبطة بالعملاء
 - ~20 مهمة مرتبطة بالمشاريع
 
+### إنشاء حسابات تجريبية بصلاحيات مختلفة:
+لاختبار نظام الصلاحيات (RBAC)، يمكنك إنشاء حسابات تجريبية:
+
+1. تأكد من تشغيل `supabase/contacts-migration.sql` أولاً
+2. افتح Supabase Dashboard → SQL Editor
+3. انسخ محتوى ملف `supabase/users-seed.sql`
+4. الصق المحتوى واضغط "Run"
+
+سيتم إنشاء 4 حسابات:
+- **مدير النظام**: `admin@test.company-os.com` / `Admin123!`
+- **مدير المبيعات**: `sales.manager@test.company-os.com` / `Sales123!`
+- **مندوب مبيعات**: `sales.rep@test.company-os.com` / `Rep123!`
+- **مستخدم عادي**: `viewer@test.company-os.com` / `View123!`
+
+لمزيد من التفاصيل، راجع ملف `TEST-USERS.md`
+
 ### ملفات مهمة تم إنشاؤها:
 - `.gitignore`: لحماية الملفات الحساسة
 - `vercel.json`: تكوين النشر على Vercel

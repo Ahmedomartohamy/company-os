@@ -10,6 +10,7 @@ import NotFound from "./NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import Debug from "../pages/Debug";
 import { ContactsList, ContactDetails } from "../modules/contacts";
+import { LeadsList } from "../modules/leads";
 
 export default function AppRouter(){
   return (
@@ -22,6 +23,7 @@ export default function AppRouter(){
           <Route path={ROUTES.clients} element={<AppShell><ClientsPage /></AppShell>} />
           <Route path={ROUTES.contacts} element={<AppShell><ContactsList /></AppShell>} />
           <Route path="/contacts/:id" element={<AppShell><ContactDetails /></AppShell>} />
+          <Route path={ROUTES.leads} element={<AppShell><LeadsList /></AppShell>} />
           <Route path={ROUTES.projects} element={<AppShell><ProjectsPage /></AppShell>} />
           <Route path={ROUTES.tasks} element={<AppShell><TasksPage /></AppShell>} />
           <Route path={ROUTES.debug} element={<AppShell><Debug /></AppShell>} />

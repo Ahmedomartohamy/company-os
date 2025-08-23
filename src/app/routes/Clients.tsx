@@ -104,6 +104,7 @@ export default function ClientsPage(){
 
       <DataTable
         data={rows}
+        searchableKeys={['name', 'email', 'phone', 'company']}
         columns={[
           { key: "name", header: "الاسم" },
           { key: "email", header: "البريد الإلكتروني" },
