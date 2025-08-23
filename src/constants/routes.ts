@@ -1,1 +1,1 @@
-export const ROUTES = { dashboard: "/", clients: "/clients", contacts: "/contacts", leads: "/leads", projects: "/projects", tasks: "/tasks", debug: "/debug" } as const;
+export const ROUTES = { dashboard: "/", clients: "/clients", contacts: "/contacts", leads: "/leads", projects: "/projects", tasks: "/tasks", debug: "/debug", pipeline: "/pipeline", pipelineDebug: "/pipeline-debug" } as const;

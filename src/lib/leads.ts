@@ -39,6 +39,8 @@ export interface LeadFilters {
   status?: string;
   source?: string;
   ownerId?: string;
+  page?: number; // Page number (1-based)
+  limit?: number; // Items per page
 }
 
 // Convert lead result interface
@@ -54,6 +56,8 @@ const TABLE = 'leads';
  * List leads with optional filters
  */
 export async function listLeads(filters: LeadFilters = {}): Promise<LeadWithOwner[]> {
+  const { page = 1, limit = 25, ...searchFilters } = filters;
+  
   let query = supabase
     .from(TABLE)
     .select(`
@@ -66,24 +70,29 @@ export async function listLeads(filters: LeadFilters = {}): Promise<LeadWithOwne
     .order('created_at', { ascending: false });
 
   // Apply text search filter
-  if (filters.q) {
-    query = query.or(`first_name.ilike.%${filters.q}%,last_name.ilike.%${filters.q}%,company.ilike.%${filters.q}%,email.ilike.%${filters.q}%`);
+  if (searchFilters.q) {
+    query = query.or(`first_name.ilike.%${searchFilters.q}%,last_name.ilike.%${searchFilters.q}%,company.ilike.%${searchFilters.q}%,email.ilike.%${searchFilters.q}%`);
   }
 
   // Apply status filter
-  if (filters.status) {
-    query = query.eq('status', filters.status);
+  if (searchFilters.status) {
+    query = query.eq('status', searchFilters.status);
   }
 
   // Apply source filter
-  if (filters.source) {
-    query = query.eq('source', filters.source);
+  if (searchFilters.source) {
+    query = query.eq('source', searchFilters.source);
   }
 
   // Apply owner filter
-  if (filters.ownerId) {
-    query = query.eq('owner_id', filters.ownerId);
+  if (searchFilters.ownerId) {
+    query = query.eq('owner_id', searchFilters.ownerId);
   }
+
+  // Apply pagination using range
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  query = query.range(from, to);
 
   const { data, error } = await query;
   

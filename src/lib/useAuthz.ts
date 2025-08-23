@@ -4,7 +4,7 @@ import { supabase } from './supabaseClient';
 
 type Role = 'admin' | 'sales_manager' | 'sales_rep' | 'viewer';
 type Action = 'view' | 'create' | 'update' | 'delete';
-type Resource = 'contacts' | 'clients' | 'projects' | 'tasks';
+type Resource = 'contacts' | 'clients' | 'projects' | 'tasks' | 'opportunities' | 'leads';
 
 interface AuthzRecord {
   owner_id?: string;
@@ -33,7 +33,11 @@ const PERMISSIONS: Record<string, Role[]> = {
   'tasks.view': ['admin', 'sales_manager', 'viewer'],
   'tasks.create': ['admin', 'sales_manager'],
   'tasks.update': ['admin', 'sales_manager'],
-  'tasks.delete': ['admin']
+  'tasks.delete': ['admin'],
+  'opportunities.view': ['admin', 'sales_manager', 'sales_rep', 'viewer'],
+  'opportunities.create': ['admin', 'sales_manager', 'sales_rep'],
+  'opportunities.update': ['admin', 'sales_manager', 'sales_rep'],
+  'opportunities.delete': ['admin']
 };
 
 export function useAuthz(): AuthzResult {
@@ -48,8 +52,11 @@ export function useAuthz(): AuthzResult {
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single();
-      if (error) throw error;
+        .maybeSingle();
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
       return data;
     },
     enabled: !!user?.id
