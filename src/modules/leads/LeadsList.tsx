@@ -37,21 +37,68 @@ export default function LeadsList({
   const [leadToDelete, setLeadToDelete] = useState<LeadWithOwner | null>(null);
   const [showConvertDialog, setShowConvertDialog] = useState(false);
   const [leadToConvert, setLeadToConvert] = useState<LeadWithOwner | null>(null);
+  const [page, setPage] = useState(1);
+  const [allLeads, setAllLeads] = useState<LeadWithOwner[]>([]);
   
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can, user } = useAuthz();
 
-  // Fetch leads with filters
-  const { data: leads = [], isLoading } = useQuery({
-    queryKey: ['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId }],
+  // Fetch leads with filters and pagination
+  const { data: leads = [], isLoading, isFetching } = useQuery({
+    queryKey: ['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId, page }],
     queryFn: () => listLeads({ 
       q: searchQuery || undefined, 
       status: selectedStatus || undefined,
       source: selectedSource || undefined,
-      ownerId: selectedOwnerId || undefined
-    })
+      ownerId: selectedOwnerId || undefined,
+      page,
+      limit: 25
+    }),
+    onSuccess: (newLeads) => {
+      if (page === 1) {
+        setAllLeads(newLeads);
+      } else {
+        setAllLeads(prev => [...prev, ...newLeads]);
+      }
+    }
   });
+
+  // Reset pagination when filters change
+  const resetPagination = () => {
+    setPage(1);
+    setAllLeads([]);
+  };
+
+  // Handle filter changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetPagination();
+  };
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
+    resetPagination();
+  };
+
+  const handleSourceChange = (value: string) => {
+    setSelectedSource(value);
+    resetPagination();
+  };
+
+  const handleOwnerChange = (value: string) => {
+    setSelectedOwnerId(value);
+    resetPagination();
+  };
+
+  // Load more leads
+  const loadMore = () => {
+    setPage(prev => prev + 1);
+  };
+
+  // Check if there are more leads to load
+  const hasMore = leads.length === 25;
+  const displayLeads = page === 1 ? leads : allLeads;
 
   // Delete mutation with optimistic updates
   const deleteMutation = useMutation({
@@ -188,14 +235,14 @@ export default function LeadsList({
           <Input
             placeholder="البحث في الأسماء والبريد الإلكتروني والشركة..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
         
         <div className="min-w-[120px]">
           <Select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => handleStatusChange(e.target.value)}
           >
             <option value="">جميع الحالات</option>
             <option value="new">جديد</option>
@@ -208,7 +255,7 @@ export default function LeadsList({
         <div className="min-w-[120px]">
           <Select
             value={selectedSource}
-            onChange={(e) => setSelectedSource(e.target.value)}
+            onChange={(e) => handleSourceChange(e.target.value)}
           >
             <option value="">جميع المصادر</option>
             <option value="website">الموقع الإلكتروني</option>
@@ -223,7 +270,7 @@ export default function LeadsList({
 
       {/* Leads Table */}
       <DataTable
-        data={leads}
+        data={displayLeads}
         searchableKeys={[]} // Disable local search since we have server-side search
         columns={[
           {
@@ -320,6 +367,19 @@ export default function LeadsList({
         ]}
         loading={isLoading}
       />
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={loadMore}
+            disabled={isFetching}
+          >
+            {isFetching ? 'جاري التحميل...' : 'عرض المزيد'}
+          </Button>
+        </div>
+      )}
 
       {/* Lead Form Modal */}
       {showForm && (

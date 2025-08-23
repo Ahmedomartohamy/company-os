@@ -35,6 +35,8 @@ interface ListContactsParams {
   q?: string; // Search query for name/email
   clientId?: string; // Filter by client
   ownerId?: string; // Filter by owner
+  page?: number; // Page number (1-based)
+  limit?: number; // Items per page
 }
 
 const TABLE = 'contacts';
@@ -43,6 +45,8 @@ const TABLE = 'contacts';
  * List contacts with optional filters and search
  */
 export async function listContacts(params: ListContactsParams = {}): Promise<ContactWithClient[]> {
+  const { page = 1, limit = 25, ...filters } = params;
+  
   let query = supabase
     .from(TABLE)
     .select(`
@@ -53,19 +57,24 @@ export async function listContacts(params: ListContactsParams = {}): Promise<Con
     .order('created_at', { ascending: false });
 
   // Apply filters
-  if (params.clientId) {
-    query = query.eq('client_id', params.clientId);
+  if (filters.clientId) {
+    query = query.eq('client_id', filters.clientId);
   }
   
-  if (params.ownerId) {
-    query = query.eq('owner_id', params.ownerId);
+  if (filters.ownerId) {
+    query = query.eq('owner_id', filters.ownerId);
   }
 
   // Apply search - basic text search on name and email
-  if (params.q) {
-    const searchTerm = `%${params.q}%`;
+  if (filters.q) {
+    const searchTerm = `%${filters.q}%`;
     query = query.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm}`);
   }
+
+  // Apply pagination using range
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  query = query.range(from, to);
 
   const { data, error } = await query;
   if (error) throw error;

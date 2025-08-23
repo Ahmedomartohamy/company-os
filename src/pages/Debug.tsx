@@ -2,6 +2,13 @@ import { useAuth } from '@/app/auth/AuthProvider';
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 
+// Utility function to mask sensitive tokens
+function maskToken(token: string | undefined): string {
+  if (!token) return 'N/A';
+  if (token.length <= 6) return '***';
+  return `${token.substring(0, 4)}${'*'.repeat(Math.max(token.length - 6, 3))}${token.substring(token.length - 2)}`;
+}
+
 interface UserProfile {
   id: string;
   email?: string;
@@ -136,10 +143,7 @@ export default function Debug() {
             <div>
               <span className="font-medium">Access Token:</span>
               <span className="ml-2 font-mono text-xs">
-                {session?.access_token 
-                  ? `${session.access_token.substring(0, 20)}...` 
-                  : 'N/A'
-                }
+                {maskToken(session?.access_token)}
               </span>
             </div>
             <div>
@@ -153,10 +157,7 @@ export default function Debug() {
             <div>
               <span className="font-medium">Refresh Token:</span>
               <span className="ml-2 font-mono text-xs">
-                {session?.refresh_token 
-                  ? `${session.refresh_token.substring(0, 20)}...` 
-                  : 'N/A'
-                }
+                {maskToken(session?.refresh_token)}
               </span>
             </div>
           </div>
@@ -190,9 +191,13 @@ export default function Debug() {
 
       {/* Raw Session Data (for debugging) */}
       <div className="mt-6 bg-gray-50 rounded-lg border p-4">
-        <h2 className="text-lg font-semibold mb-4">Raw Session Data</h2>
+        <h2 className="text-lg font-semibold mb-4">Raw Session Data (Tokens Masked)</h2>
         <pre className="text-xs overflow-auto bg-white p-3 rounded border">
-          {JSON.stringify(session, null, 2)}
+          {JSON.stringify(session ? {
+            ...session,
+            access_token: maskToken(session.access_token),
+            refresh_token: maskToken(session.refresh_token)
+          } : null, null, 2)}
         </pre>
       </div>
     </div>

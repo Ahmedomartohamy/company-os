@@ -35,20 +35,62 @@ export default function ContactsList({
   const [editingContact, setEditingContact] = useState<ContactWithClient | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<ContactWithClient | null>(null);
+  const [page, setPage] = useState(1);
+  const [allContacts, setAllContacts] = useState<ContactWithClient[]>([]);
   
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can } = useAuthz();
 
-  // Fetch contacts with filters
-  const { data: contacts = [], isLoading } = useQuery({
-    queryKey: ['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId }],
+  // Fetch contacts with filters and pagination
+  const { data: contacts = [], isLoading, isFetching } = useQuery({
+    queryKey: ['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId, page }],
     queryFn: () => listContacts({ 
       q: searchQuery || undefined, 
       clientId: selectedClientId || undefined,
-      ownerId: selectedOwnerId || undefined
-    })
+      ownerId: selectedOwnerId || undefined,
+      page,
+      limit: 25
+    }),
+    onSuccess: (newContacts) => {
+      if (page === 1) {
+        setAllContacts(newContacts);
+      } else {
+        setAllContacts(prev => [...prev, ...newContacts]);
+      }
+    }
   });
+
+  // Reset pagination when filters change
+  const resetPagination = () => {
+    setPage(1);
+    setAllContacts([]);
+  };
+
+  // Handle filter changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    resetPagination();
+  };
+
+  const handleClientChange = (value: string) => {
+    setSelectedClientId(value);
+    resetPagination();
+  };
+
+  const handleOwnerChange = (value: string) => {
+    setSelectedOwnerId(value);
+    resetPagination();
+  };
+
+  // Load more contacts
+  const loadMore = () => {
+    setPage(prev => prev + 1);
+  };
+
+  // Check if there are more contacts to load
+  const hasMore = contacts.length === 25;
+  const displayContacts = page === 1 ? contacts : allContacts;
 
   // Fetch clients for filter dropdown (only if not in client details)
   const { data: clients = [] } = useQuery({
@@ -150,7 +192,7 @@ export default function ContactsList({
           <Input
             placeholder="البحث في الأسماء والبريد الإلكتروني..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
         
@@ -158,7 +200,7 @@ export default function ContactsList({
           <div className="min-w-[150px]">
             <Select
               value={selectedClientId}
-              onChange={(e) => setSelectedClientId(e.target.value)}
+              onChange={(e) => handleClientChange(e.target.value)}
             >
               <option value="">جميع العملاء</option>
               {clients.map(client => (
@@ -173,7 +215,7 @@ export default function ContactsList({
 
       {/* Contacts Table */}
       <DataTable
-        data={contacts}
+        data={displayContacts}
         columns={[
           {
             key: 'first_name',
@@ -255,6 +297,19 @@ export default function ContactsList({
         ]}
         loading={isLoading}
       />
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={loadMore}
+            disabled={isFetching}
+          >
+            {isFetching ? 'جاري التحميل...' : 'عرض المزيد'}
+          </Button>
+        </div>
+      )}
 
       {/* Contact Form Modal */}
       {showForm && (
