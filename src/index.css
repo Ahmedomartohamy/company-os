@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #0D2A4B;
+  --accent: #FF6B00;
+  --bg: #F2F2F2;
+  --surface: #FFFFFF;
+  --text: #1A1A1A;
+  --muted: #666666;
+}
+
+html[dir="rtl"] * { letter-spacing: 0; }
+
+/* تنسيقات مخصصة لعناصر Select */
+select {
+  padding: 0.5rem 0.75rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: left 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-left: 2.5rem;
+}
+
+html[dir="rtl"] select {
+  background-position: right 0.5rem center;
+  padding-left: 0.75rem;
+  padding-right: 2.5rem;
+}
+
+/* تحسين مظهر الخيارات */
+select option {
+  padding: 0.5rem;
+  background-color: white;
+  color: var(--text);
+}
+
+select option:checked {
+  background-color: var(--brand);
+  color: white;
+}
