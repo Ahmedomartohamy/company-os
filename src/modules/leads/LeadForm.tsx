@@ -17,11 +17,7 @@ interface LeadFormProps {
   onCancel: () => void;
 }
 
-export default function LeadForm({ 
-  lead, 
-  onSuccess, 
-  onCancel
-}: LeadFormProps) {
+export default function LeadForm({ lead, onSuccess, onCancel }: LeadFormProps) {
   const queryClient = useQueryClient();
   const { can } = useAuthz();
   const isEditing = !!lead;
@@ -36,7 +32,7 @@ export default function LeadForm({
     source: lead?.source || 'other',
     status: lead?.status || 'new',
     score: lead?.score || 0,
-    notes: lead?.notes || ''
+    notes: lead?.notes || '',
   });
 
   // Create mutation with optimistic updates
@@ -45,29 +41,27 @@ export default function LeadForm({
     onMutate: async (newLead) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['leads'] });
-      
+
       // Create optimistic lead
       const optimisticLead: LeadWithOwner = {
         ...newLead,
         id: `temp-${Date.now()}`, // Temporary ID
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
-      
+
       // Add to all relevant queries
-      queryClient.setQueriesData(
-        { queryKey: ['leads'] },
-        (old: LeadWithOwner[] = []) => [optimisticLead, ...old]
-      );
-      
+      queryClient.setQueriesData({ queryKey: ['leads'] }, (old: LeadWithOwner[] = []) => [
+        optimisticLead,
+        ...old,
+      ]);
+
       return { optimisticLead };
     },
     onError: (err, newLead, context) => {
       // Remove optimistic lead on error
       if (context?.optimisticLead) {
-        queryClient.setQueriesData(
-          { queryKey: ['leads'] },
-          (old: LeadWithOwner[] = []) => 
-            old.filter(l => l.id !== context.optimisticLead.id)
+        queryClient.setQueriesData({ queryKey: ['leads'] }, (old: LeadWithOwner[] = []) =>
+          old.filter((l) => l.id !== context.optimisticLead.id),
         );
       }
       toast.error('حدث خطأ أثناء إضافة العميل المحتمل');
@@ -79,27 +73,24 @@ export default function LeadForm({
     onSettled: () => {
       // Always refetch to get real data
       queryClient.invalidateQueries({ queryKey: ['leads'] });
-    }
+    },
   });
 
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Lead> }) => 
-      updateLead(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Lead> }) => updateLead(id, data),
     onMutate: async ({ id, data }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['leads'] });
-      
+
       // Snapshot previous value
       const previousLeads = queryClient.getQueriesData({ queryKey: ['leads'] });
-      
+
       // Optimistically update lead
-      queryClient.setQueriesData(
-        { queryKey: ['leads'] },
-        (old: LeadWithOwner[] = []) => 
-          old.map(l => l.id === id ? { ...l, ...data } : l)
+      queryClient.setQueriesData({ queryKey: ['leads'] }, (old: LeadWithOwner[] = []) =>
+        old.map((l) => (l.id === id ? { ...l, ...data } : l)),
       );
-      
+
       return { previousLeads };
     },
     onError: (err, variables, context) => {
@@ -118,7 +109,7 @@ export default function LeadForm({
     onSettled: () => {
       // Always refetch to get real data
       queryClient.invalidateQueries({ queryKey: ['leads'] });
-    }
+    },
   });
 
   // Reset form when lead changes
@@ -133,7 +124,7 @@ export default function LeadForm({
         source: lead.source || 'other',
         status: lead.status || 'new',
         score: lead.score || 0,
-        notes: lead.notes || ''
+        notes: lead.notes || '',
       });
     }
   }, [lead, form]);
@@ -209,10 +200,7 @@ export default function LeadForm({
       {/* Source & Status */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Select
-            {...form.register('source')}
-            error={form.formState.errors.source?.message}
-          >
+          <Select {...form.register('source')} error={form.formState.errors.source?.message}>
             <option value="website">الموقع الإلكتروني</option>
             <option value="referral">إحالة</option>
             <option value="ads">إعلانات</option>
@@ -222,10 +210,7 @@ export default function LeadForm({
           </Select>
         </div>
         <div>
-          <Select
-            {...form.register('status')}
-            error={form.formState.errors.status?.message}
-          >
+          <Select {...form.register('status')} error={form.formState.errors.status?.message}>
             <option value="new">جديد</option>
             <option value="contacted">تم التواصل</option>
             <option value="qualified">مؤهل</option>
@@ -258,26 +243,16 @@ export default function LeadForm({
 
       {/* Validation Message */}
       {form.formState.errors.root && (
-        <div className="text-red-600 text-sm">
-          {form.formState.errors.root.message}
-        </div>
+        <div className="text-red-600 text-sm">{form.formState.errors.root.message}</div>
       )}
 
       {/* Form Actions */}
       <div className="flex justify-end gap-3 pt-4">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
           إلغاء
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading ? 'جاري الحفظ...' : (isEditing ? 'تعديل' : 'إضافة')}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'جاري الحفظ...' : isEditing ? 'تعديل' : 'إضافة'}
         </Button>
       </div>
     </form>

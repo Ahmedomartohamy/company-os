@@ -1,11 +1,21 @@
-import { cn } from "@/lib/cn";
-import type { ReactNode } from "react";
+import { cn } from '@/lib/cn';
+import type { ReactNode } from 'react';
 
 export function Card(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} className={cn("bg-surface rounded-2xl shadow-card p-4", props.className)} />;
+  return (
+    <div {...props} className={cn('bg-surface rounded-2xl shadow-card p-4', props.className)} />
+  );
 }
 
-export function CardHeader({ title, actions, icon }: { title: string; actions?: React.ReactNode; icon?: ReactNode }) {
+export function CardHeader({
+  title,
+  actions,
+  icon,
+}: {
+  title: string;
+  actions?: React.ReactNode;
+  icon?: ReactNode;
+}) {
   return (
     <div className="mb-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -17,7 +27,15 @@ export function CardHeader({ title, actions, icon }: { title: string; actions?: 
   );
 }
 
-export function KPI({ label, value, icon }: { label: string; value: string | number; icon?: ReactNode }) {
+export function KPI({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string | number;
+  icon?: ReactNode;
+}) {
   return (
     <div className="rounded-2xl bg-surface p-5 shadow-soft flex items-center gap-3">
       {icon && <span className="text-brand">{icon}</span>}

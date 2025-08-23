@@ -1,18 +1,22 @@
 # Sprint 2 Closeout Report
 
 ## Overview
+
 Sprint 2 focused on implementing the Leads Management module with full RBAC integration, lead conversion functionality, and comprehensive UI components.
 
 ## Implemented Files
 
 ### Backend/Database
+
 - `supabase/migrations/2025-08-23-s2-leads.sql` - Leads table schema and RPC functions
 - `supabase/users-seed.sql` - Test users with different roles for RBAC testing
 
 ### Data Access Layer
+
 - `src/lib/leads.ts` - Leads CRUD operations and convert_lead RPC integration
 
 ### UI Components
+
 - `src/modules/leads/LeadsList.tsx` - Main leads listing with filters, search, and RBAC actions
 - `src/modules/leads/LeadForm.tsx` - Lead creation/editing form with validation
 - `src/modules/leads/ConvertLeadDialog.tsx` - Lead conversion to client/contact workflow
@@ -20,16 +24,19 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 - `src/components/ui/Checkbox.tsx` - Checkbox input component
 
 ### Routes & Navigation
+
 - Updated `src/app/Router.tsx` - Added /leads routes
 - Updated `src/components/common/Sidebar.tsx` - Added Leads navigation item
 
 ### Documentation
+
 - `docs/sprint-2/FE-REPORT.md` - Technical implementation details
 - `docs/sprint-2/DB-REPORT.md` - Database schema and migration details
 - `TEST-USERS.md` - Test user accounts documentation
 - Updated `README.md` - Added test accounts section
 
 ## Routes Implemented
+
 - `/leads` - Main leads listing page
 - `/leads/new` - Create new lead form
 - `/leads/:id/edit` - Edit existing lead form
@@ -37,6 +44,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 ## Screenshots Placeholders
 
 ### Leads List Page (/leads)
+
 ```
 [Screenshot: Leads listing with filters, search, and action buttons]
 - Shows lead status badges (new, contacted, qualified, lost)
@@ -46,6 +54,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 ```
 
 ### Convert Lead Dialog
+
 ```
 [Screenshot: Convert lead dialog with client selection]
 - Radio buttons: "Create New Client" vs "Select Existing Client"
@@ -57,14 +66,15 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 
 ## RBAC Verification Table
 
-| Role | View Leads | Create Lead | Edit Own Lead | Edit All Leads | Delete Lead | Convert Lead |
-|------|------------|-------------|---------------|----------------|-------------|-------------|
-| **Admin** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Sales Manager** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Sales Rep** | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| **Viewer** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Role              | View Leads | Create Lead | Edit Own Lead | Edit All Leads | Delete Lead | Convert Lead |
+| ----------------- | ---------- | ----------- | ------------- | -------------- | ----------- | ------------ |
+| **Admin**         | ✅         | ✅          | ✅            | ✅             | ✅          | ✅           |
+| **Sales Manager** | ✅         | ✅          | ✅            | ✅             | ✅          | ✅           |
+| **Sales Rep**     | ✅         | ✅          | ✅            | ❌             | ❌          | ✅           |
+| **Viewer**        | ✅         | ❌          | ❌            | ❌             | ❌          | ❌           |
 
 ### RBAC Implementation Details
+
 - Database-level RLS policies enforce permissions
 - UI components use `useAuthz` hook to show/hide actions
 - Role-based button visibility and form access control
@@ -73,6 +83,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 ## Smoke Test Checklist
 
 ### Test 1: Admin Full Workflow
+
 **Login:** `admin@test.company-os.com` / `Admin123!`
 
 1. ✅ Navigate to /leads - verify page loads
@@ -88,6 +99,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 11. ✅ Navigate to dashboard - verify new client created
 
 ### Test 2: Sales Rep Permissions
+
 **Login:** `sales.rep@test.company-os.com` / `Rep123!`
 
 1. ✅ Navigate to /leads - verify page loads
@@ -101,6 +113,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 9. ❌ Verify cannot delete any leads (no delete buttons)
 
 ### Test 3: Viewer Read-Only Access
+
 **Login:** `viewer@test.company-os.com` / `View123!`
 
 1. ✅ Navigate to /leads - verify page loads
@@ -113,6 +126,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 8. ❌ Try direct URL access to /leads/new - verify redirected/blocked
 
 ### Test 4: Lead Status Flow
+
 **Any authorized user:**
 
 1. ✅ Create lead - verify status starts as "New"
@@ -123,12 +137,14 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 ## Technical Achievements
 
 ### Database Integration
+
 - ✅ Supabase RLS policies implemented
 - ✅ Custom RPC function for lead conversion
 - ✅ Proper foreign key relationships
 - ✅ Audit logging for lead changes
 
 ### Frontend Architecture
+
 - ✅ Modular component structure
 - ✅ React Query for data fetching
 - ✅ Zod validation schemas
@@ -136,6 +152,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 - ✅ Arabic RTL support
 
 ### User Experience
+
 - ✅ Responsive design
 - ✅ Loading states and error handling
 - ✅ Form validation with user feedback
@@ -147,6 +164,7 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
 ### Sprint 3 Roadmap: Opportunities & Pipeline Management
 
 #### Planned Features
+
 1. **Opportunities Module**
    - Create opportunities from qualified leads
    - Opportunity stages (Prospecting, Proposal, Negotiation, Closed Won/Lost)
@@ -166,24 +184,28 @@ Sprint 2 focused on implementing the Leads Management module with full RBAC inte
    - Team performance metrics
 
 #### Technical Debt
+
 - [ ] Add comprehensive error boundaries
 - [ ] Implement offline support with service workers
 - [ ] Add unit tests for lead components
 - [ ] Optimize bundle size with code splitting
 
 #### Known Limitations
+
 - Lead assignment to users not yet implemented
 - Bulk operations (import/export) not available
 - Email integration for lead nurturing pending
 - Advanced filtering (date ranges, custom fields) not implemented
 
 ## Deployment Status
+
 - ✅ Development server running on http://localhost:5173/
 - ✅ Database migrations ready for production
 - ✅ Test users configured for UAT
 - ⏳ Production deployment pending Sprint 3 completion
 
 ## Success Metrics
+
 - **Code Coverage:** Components implemented with TypeScript safety
 - **RBAC Compliance:** 100% role-based access control implemented
 - **User Experience:** Responsive design with Arabic RTL support

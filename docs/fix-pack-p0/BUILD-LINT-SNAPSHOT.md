@@ -3,22 +3,22 @@
 **Generated:** 2025-01-27  
 **Command:** `npm run typecheck && npm run build`  
 **Total Errors:** 48 errors in 10 files  
-**Exit Code:** 1  
+**Exit Code:** 1
 
 ## Error Summary by File
 
-| File | Error Count | Primary Issues |
-|------|-------------|----------------|
-| src/lib/opportunities.ts | 1 | Property access on array type |
-| src/modules/contacts/ContactDetails.tsx | 4 | Component prop mismatches |
-| src/modules/contacts/ContactForm.tsx | 8 | Input component prop errors |
-| src/modules/leads/ConvertLeadDialog.tsx | 2 | Form type mismatches |
-| src/modules/leads/LeadForm.tsx | 9 | RBAC + Input prop errors |
-| src/modules/leads/LeadsList.tsx | 11 | Component prop + type errors |
-| src/modules/opportunities/OpportunitiesBoard.tsx | 1 | Component prop mismatch |
-| src/modules/opportunities/OpportunityCard.tsx | 2 | Component prop errors |
-| src/modules/opportunities/OpportunityDetails.tsx | 4 | Component prop mismatches |
-| src/modules/opportunities/OpportunityForm.tsx | 6 | Input component prop errors |
+| File                                             | Error Count | Primary Issues                |
+| ------------------------------------------------ | ----------- | ----------------------------- |
+| src/lib/opportunities.ts                         | 1           | Property access on array type |
+| src/modules/contacts/ContactDetails.tsx          | 4           | Component prop mismatches     |
+| src/modules/contacts/ContactForm.tsx             | 8           | Input component prop errors   |
+| src/modules/leads/ConvertLeadDialog.tsx          | 2           | Form type mismatches          |
+| src/modules/leads/LeadForm.tsx                   | 9           | RBAC + Input prop errors      |
+| src/modules/leads/LeadsList.tsx                  | 11          | Component prop + type errors  |
+| src/modules/opportunities/OpportunitiesBoard.tsx | 1           | Component prop mismatch       |
+| src/modules/opportunities/OpportunityCard.tsx    | 2           | Component prop errors         |
+| src/modules/opportunities/OpportunityDetails.tsx | 4           | Component prop mismatches     |
+| src/modules/opportunities/OpportunityForm.tsx    | 6           | Input component prop errors   |
 
 ## Full Error Log
 
@@ -113,26 +113,34 @@ Errors  Files
 ## Error Pattern Analysis
 
 ### 1. Input Component Prop Errors (Most Common)
+
 - **Pattern:** `Property 'error' does not exist on type 'IntrinsicAttributes & InputHTMLAttributes<HTMLInputElement>'`
 - **Affected Files:** ContactForm.tsx, LeadForm.tsx, OpportunityForm.tsx
 - **Root Cause:** Custom Input component expects `error` prop but TypeScript sees standard HTML input
 
 ### 2. Form DefaultValues Type Mismatches
+
 - **Pattern:** `Type 'number | undefined' is not assignable to type 'number'`
 - **Affected Properties:** `client_id`, `contact_id`
 - **Root Cause:** Optional fields in form schema vs required in type definition
 
 ### 3. Component Prop Mismatches
+
 - **Pattern:** Properties like `description`, `subtitle` don't exist on component types
 - **Affected Files:** ContactDetails.tsx, OpportunityDetails.tsx
 - **Root Cause:** Component interface definitions don't match usage
 
 ### 4. RBAC Type Errors
+
 - **Pattern:** `Argument of type '"leads"' is not assignable to parameter of type 'Resource'`
 - **Root Cause:** String literals not matching Resource union type
 
 ### 5. Array Property Access Error
+
 - **Pattern:** `Property 'name' does not exist on type '{ id: any; name: any; }[]'`
 - **File:** opportunities.ts:286
 - **Root Cause:** Accessing property on array instead of array element
+
+```
+
 ```

@@ -23,16 +23,20 @@ export default function ContactDetails() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can } = useAuthz();
-  
+
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Fetch contact details
-  const { data: contact, isLoading, error } = useQuery({
+  const {
+    data: contact,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['contact', id],
     queryFn: () => getContact(id!),
-    enabled: !!id
+    enabled: !!id,
   });
 
   // Delete mutation
@@ -44,7 +48,7 @@ export default function ContactDetails() {
     },
     onError: () => {
       toast.error('حدث خطأ أثناء حذف جهة الاتصال');
-    }
+    },
   });
 
   const handleEdit = () => {
@@ -85,11 +89,7 @@ export default function ContactDetails() {
       <EmptyState
         title="جهة الاتصال غير موجودة"
         description="لم يتم العثور على جهة الاتصال المطلوبة"
-        action={
-          <Button onClick={() => navigate('/contacts')}>
-            العودة إلى جهات الاتصال
-          </Button>
-        }
+        action={<Button onClick={() => navigate('/contacts')}>العودة إلى جهات الاتصال</Button>}
       />
     );
   }
@@ -97,40 +97,31 @@ export default function ContactDetails() {
   const tabs = [
     { id: 'overview', label: 'نظرة عامة', icon: User },
     { id: 'activities', label: 'الأنشطة', icon: Calendar },
-    { id: 'files', label: 'الملفات', icon: Building }
+    { id: 'files', label: 'الملفات', icon: Building },
   ] as const;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <PageHeader 
+      <PageHeader
         title={`${contact.first_name} ${contact.last_name || ''}`}
         subtitle={contact.position || contact.company}
       >
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/contacts')}
-          >
+          <Button variant="ghost" onClick={() => navigate('/contacts')}>
             <ArrowRight className="w-4 h-4 ml-2" />
             العودة
           </Button>
-          
+
           {can('update', 'contacts', contact) && (
-            <Button
-              variant="secondary"
-              onClick={handleEdit}
-            >
+            <Button variant="secondary" onClick={handleEdit}>
               <Pencil className="w-4 h-4 ml-2" />
               تعديل
             </Button>
           )}
-          
+
           {can('delete', 'contacts', contact) && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-            >
+            <Button variant="destructive" onClick={handleDelete}>
               <Trash2 className="w-4 h-4 ml-2" />
               حذف
             </Button>
@@ -149,9 +140,10 @@ export default function ContactDetails() {
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`
                   flex items-center py-2 px-1 border-b-2 font-medium text-sm
-                  ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }
                 `}
               >
@@ -177,28 +169,34 @@ export default function ContactDetails() {
                       <div>
                         <div className="text-sm text-gray-500">البريد الإلكتروني</div>
                         <div className="font-medium">
-                          <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline">
+                          <a
+                            href={`mailto:${contact.email}`}
+                            className="text-blue-600 hover:underline"
+                          >
                             {contact.email}
                           </a>
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {contact.phone && (
                     <div className="flex items-center">
                       <Phone className="w-5 h-5 text-gray-400 ml-3" />
                       <div>
                         <div className="text-sm text-gray-500">الهاتف</div>
                         <div className="font-medium">
-                          <a href={`tel:${contact.phone}`} className="text-blue-600 hover:underline">
+                          <a
+                            href={`tel:${contact.phone}`}
+                            className="text-blue-600 hover:underline"
+                          >
                             {contact.phone}
                           </a>
                         </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {contact.company && (
                     <div className="flex items-center">
                       <Building className="w-5 h-5 text-gray-400 ml-3" />
@@ -208,7 +206,7 @@ export default function ContactDetails() {
                       </div>
                     </div>
                   )}
-                  
+
                   {contact.position && (
                     <div className="flex items-center">
                       <User className="w-5 h-5 text-gray-400 ml-3" />
@@ -220,7 +218,7 @@ export default function ContactDetails() {
                   )}
                 </div>
               </Card>
-              
+
               {contact.notes && (
                 <Card title="ملاحظات" className="mt-6">
                   <p className="text-gray-700 whitespace-pre-wrap">{contact.notes}</p>
@@ -246,7 +244,7 @@ export default function ContactDetails() {
                   </div>
                 </Card>
               )}
-              
+
               {/* Owner Info */}
               {contact.owner && (
                 <Card title="المسؤول">
@@ -255,20 +253,24 @@ export default function ContactDetails() {
                   </div>
                 </Card>
               )}
-              
+
               {/* Metadata */}
               <Card title="معلومات إضافية">
                 <div className="space-y-3 text-sm">
                   <div>
                     <div className="text-gray-500">تاريخ الإنشاء</div>
                     <div className="font-medium">
-                      {contact.created_at ? new Date(contact.created_at).toLocaleDateString('ar-SA') : '-'}
+                      {contact.created_at
+                        ? new Date(contact.created_at).toLocaleDateString('ar-SA')
+                        : '-'}
                     </div>
                   </div>
                   <div>
                     <div className="text-gray-500">آخر تعديل</div>
                     <div className="font-medium">
-                      {contact.updated_at ? new Date(contact.updated_at).toLocaleDateString('ar-SA') : '-'}
+                      {contact.updated_at
+                        ? new Date(contact.updated_at).toLocaleDateString('ar-SA')
+                        : '-'}
                     </div>
                   </div>
                 </div>
@@ -278,27 +280,17 @@ export default function ContactDetails() {
         )}
 
         {activeTab === 'activities' && (
-          <EmptyState
-            title="الأنشطة"
-            description="سيتم إضافة تتبع الأنشطة في إصدار لاحق"
-          />
+          <EmptyState title="الأنشطة" description="سيتم إضافة تتبع الأنشطة في إصدار لاحق" />
         )}
 
         {activeTab === 'files' && (
-          <EmptyState
-            title="الملفات"
-            description="سيتم إضافة إدارة الملفات في إصدار لاحق"
-          />
+          <EmptyState title="الملفات" description="سيتم إضافة إدارة الملفات في إصدار لاحق" />
         )}
       </div>
 
       {/* Edit Form Modal */}
       {showEditForm && (
-        <Modal
-          open={showEditForm}
-          onClose={() => setShowEditForm(false)}
-          title="تعديل جهة الاتصال"
-        >
+        <Modal open={showEditForm} onClose={() => setShowEditForm(false)} title="تعديل جهة الاتصال">
           <ContactForm
             contact={contact}
             onSuccess={handleFormSuccess}

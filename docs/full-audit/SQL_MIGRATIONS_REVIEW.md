@@ -1,11 +1,13 @@
 # SQL Migrations Review
 
 ## Overview
+
 Comprehensive review of database schema, RLS policies, indexes, and functions across all tables.
 
 ## Database Tables Inventory
 
 ### Core Tables
+
 1. **profiles** - User profiles with RBAC roles
 2. **clients** - Client management
 3. **projects** - Project tracking
@@ -21,6 +23,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ### ✅ Tables with RLS Enabled
 
 #### 1. profiles
+
 - **Status**: ✅ RLS Enabled
 - **Policies**:
   - `profiles_read_all_auth`: SELECT for all authenticated users
@@ -29,6 +32,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - **Security Level**: Good - Role-based access control
 
 #### 2. leads
+
 - **Status**: ✅ RLS Enabled
 - **Policies**:
   - `leads_read_policy`: SELECT based on role (admin/sales_manager see all, sales_rep see own)
@@ -38,6 +42,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - **Security Level**: Excellent - Comprehensive role and ownership-based access
 
 #### 3. opportunities
+
 - **Status**: ✅ RLS Enabled
 - **Policies**:
   - `opportunities_read_policy`: SELECT based on role hierarchy
@@ -47,6 +52,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - **Security Level**: Excellent - Multi-level access control
 
 #### 4. pipelines
+
 - **Status**: ✅ RLS Enabled
 - **Policies**:
   - `pipelines_read_policy`: SELECT for all authenticated users
@@ -56,6 +62,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - **Security Level**: Good - Admin-controlled configuration
 
 #### 5. stages
+
 - **Status**: ✅ RLS Enabled
 - **Policies**:
   - `stages_read_policy`: SELECT for all authenticated users
@@ -67,24 +74,28 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ### ⚠️ Tables Missing RLS (CRITICAL SECURITY GAPS)
 
 #### 1. clients
+
 - **Status**: ❌ RLS NOT ENABLED
 - **Risk Level**: HIGH
 - **Impact**: All authenticated users can access all client data
 - **Recommendation**: Implement role-based RLS policies immediately
 
 #### 2. projects
+
 - **Status**: ❌ RLS NOT ENABLED
 - **Risk Level**: HIGH
 - **Impact**: All authenticated users can access all project data
 - **Recommendation**: Implement role-based RLS policies immediately
 
 #### 3. tasks
+
 - **Status**: ❌ RLS NOT ENABLED
 - **Risk Level**: HIGH
 - **Impact**: All authenticated users can access all task data
 - **Recommendation**: Implement role-based RLS policies immediately
 
 #### 4. contacts
+
 - **Status**: ❌ RLS NOT ENABLED
 - **Risk Level**: HIGH
 - **Impact**: All authenticated users can access all contact data
@@ -93,6 +104,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ## Database Functions (RPCs)
 
 ### Defined Functions
+
 1. **convert_lead**: Converts lead to opportunity
    - Security: Uses RLS policies of target tables
    - Access: Controlled by leads and opportunities RLS
@@ -106,6 +118,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ### Performance Indexes
 
 #### leads table
+
 - `idx_leads_owner_id`: Optimizes owner-based queries
 - `idx_leads_status`: Optimizes status filtering
 - `idx_leads_source`: Optimizes source-based reporting
@@ -113,6 +126,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - `idx_leads_created_at`: Optimizes time-based queries
 
 #### opportunities table
+
 - `idx_opportunities_owner_id`: Optimizes owner-based queries
 - `idx_opportunities_stage_id`: Optimizes pipeline stage queries
 - `idx_opportunities_pipeline_id`: Optimizes pipeline filtering
@@ -120,6 +134,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 - `idx_opportunities_expected_close_date`: Optimizes forecasting queries
 
 #### Missing Indexes (Performance Gaps)
+
 - **clients**: No performance indexes identified
 - **projects**: No performance indexes identified
 - **tasks**: No performance indexes identified
@@ -128,7 +143,9 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ## Security Recommendations
 
 ### CRITICAL (Immediate Action Required)
+
 1. **Enable RLS on core tables**:
+
    ```sql
    ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
    ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
@@ -143,23 +160,25 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
    - Viewer: Read-only access to assigned records
 
 ### HIGH PRIORITY
+
 1. **Add performance indexes**:
+
    ```sql
    -- clients table
    CREATE INDEX idx_clients_created_at ON clients(created_at);
    CREATE INDEX idx_clients_company ON clients(company);
-   
+
    -- projects table
    CREATE INDEX idx_projects_client_id ON projects(client_id);
    CREATE INDEX idx_projects_status ON projects(status);
    CREATE INDEX idx_projects_start_date ON projects(start_date);
-   
+
    -- tasks table
    CREATE INDEX idx_tasks_project_id ON tasks(project_id);
    CREATE INDEX idx_tasks_assigned_to ON tasks(assigned_to);
    CREATE INDEX idx_tasks_status ON tasks(status);
    CREATE INDEX idx_tasks_due_date ON tasks(due_date);
-   
+
    -- contacts table
    CREATE INDEX idx_contacts_client_id ON contacts(client_id);
    CREATE INDEX idx_contacts_owner_id ON contacts(owner_id);
@@ -167,6 +186,7 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
    ```
 
 ### MEDIUM PRIORITY
+
 1. **Audit existing RLS policies** for potential privilege escalation
 2. **Add database-level constraints** for data integrity
 3. **Implement audit logging** for sensitive operations
@@ -174,15 +194,18 @@ Comprehensive review of database schema, RLS policies, indexes, and functions ac
 ## Compliance Assessment
 
 ### Data Protection
+
 - ❌ **Incomplete**: Core business data lacks access controls
 - ✅ **Good**: User profile data properly protected
 - ✅ **Good**: Sales pipeline data properly protected
 
 ### Performance
+
 - ⚠️ **Partial**: Some tables have good indexing, others lack optimization
 - ✅ **Good**: Foreign key relationships properly indexed
 
 ### Scalability
+
 - ⚠️ **Concerns**: Missing indexes may cause performance issues at scale
 - ✅ **Good**: RLS policies designed for role-based scaling
 

@@ -1,11 +1,13 @@
 # Sprint 2 Frontend Report - Leads Module Implementation
 
 ## Overview
+
 This report documents the implementation of the Leads module for the CRM system, including new screens, data access layer, routing, and RBAC integration.
 
 ## Files Created
 
 ### Data Access Layer
+
 - **`src/lib/leads.ts`** - Complete data access layer for leads management
   - Lead schema validation using Zod
   - CRUD operations with TanStack Query integration
@@ -13,6 +15,7 @@ This report documents the implementation of the Leads module for the CRM system,
   - Lead statistics and filtering capabilities
 
 ### UI Components
+
 - **`src/modules/leads/LeadsList.tsx`** - Main leads listing page
   - Data table with filtering and search
   - Status and source filters
@@ -32,31 +35,36 @@ This report documents the implementation of the Leads module for the CRM system,
   - Success navigation to client details
 
 ### Module Structure
+
 - **`src/modules/leads/index.ts`** - Module exports
 
 ## Routes Added
 
 ### Route Configuration
+
 - **`src/constants/routes.ts`** - Added `leads: "/leads"` constant
 - **`src/app/Router.tsx`** - Registered `/leads` route with LeadsList component
 
 ### Available Routes
+
 - `/leads` → LeadsList component (protected route)
 
 ## RBAC Implementation
 
 ### Permission Mapping
+
 The following permissions are enforced in the UI using `useAuthz()` hook:
 
-| Permission | Resource | Roles | Description |
-|------------|----------|-------|-------------|
-| `leads.view` | leads | all roles | View leads list and details |
-| `leads.create` | leads | admin, sales_manager, sales_rep | Create new leads |
-| `leads.update` | leads | admin, sales_manager, ownerOnly for sales_rep | Update existing leads |
-| `leads.delete` | leads | admin only | Delete leads |
-| `leads.convert` | leads | same as leads.update | Convert leads to clients |
+| Permission      | Resource | Roles                                         | Description                 |
+| --------------- | -------- | --------------------------------------------- | --------------------------- |
+| `leads.view`    | leads    | all roles                                     | View leads list and details |
+| `leads.create`  | leads    | admin, sales_manager, sales_rep               | Create new leads            |
+| `leads.update`  | leads    | admin, sales_manager, ownerOnly for sales_rep | Update existing leads       |
+| `leads.delete`  | leads    | admin only                                    | Delete leads                |
+| `leads.convert` | leads    | same as leads.update                          | Convert leads to clients    |
 
 ### Owner-based Access Control
+
 - Sales representatives can only update/convert leads they own
 - Owner check compares `record.owner_id` with current user ID
 - Buttons are hidden/disabled based on permissions
@@ -64,6 +72,7 @@ The following permissions are enforced in the UI using `useAuthz()` hook:
 ## Data Model
 
 ### Lead Schema
+
 ```typescript
 interface Lead {
   id?: string;
@@ -82,6 +91,7 @@ interface Lead {
 ```
 
 ### Validation Rules
+
 - Either `first_name` OR `company` is required
 - Email must follow valid pattern (optional)
 - Score must be between 0-100
@@ -91,6 +101,7 @@ interface Lead {
 ## Features Implemented
 
 ### LeadsList Features
+
 - **Search**: Text search across name, email, and company fields
 - **Filters**: Status dropdown, Source dropdown
 - **Columns**: Name, Company, Source, Status (with colored badges), Owner, Created Date
@@ -99,12 +110,14 @@ interface Lead {
 - **Loading States**: Skeleton loading during data fetch
 
 ### LeadForm Features
+
 - **Validation**: Real-time Zod validation with Arabic messages
 - **Optimistic Updates**: Immediate UI updates with rollback on error
 - **Auto-assignment**: Owner set to current user on create
 - **RTL Support**: Proper Arabic text direction
 
 ### ConvertLeadDialog Features
+
 - **Client Selection**: Async search through existing clients
 - **New Client Creation**: Checkbox to create client from company name
 - **Contact Creation**: Toggle to create contact (default enabled)
@@ -113,18 +126,21 @@ interface Lead {
 ## Technical Implementation
 
 ### State Management
+
 - TanStack Query for server state management
 - Optimistic updates for better UX
 - Error handling with toast notifications
 - Loading states throughout the application
 
 ### Form Handling
+
 - Zod schema validation
 - Custom form hooks integration
 - Real-time validation feedback
 - Arabic error messages
 
 ### API Integration
+
 - Supabase client for database operations
 - RPC call for lead conversion: `convert_lead(_lead_id, _client_id)`
 - Row Level Security (RLS) policy enforcement
@@ -132,11 +148,13 @@ interface Lead {
 ## Convert Lead Flow - How to Reproduce
 
 ### Prerequisites
+
 1. User must have `leads.convert` permission
 2. Lead must exist in the system
 3. User must be owner of the lead (for sales_rep role)
 
 ### Step-by-Step Process
+
 1. **Navigate to Leads**: Go to `/leads` page
 2. **Find Lead**: Use search or filters to locate the lead
 3. **Click Convert**: Click the convert button (arrow icon) for the desired lead
@@ -148,6 +166,7 @@ interface Lead {
 7. **Success**: Toast notification appears and user is redirected to client details page
 
 ### Expected Results
+
 - Lead status may be updated to 'qualified'
 - New client created (if selected)
 - New contact created (if enabled)
@@ -155,6 +174,7 @@ interface Lead {
 - Success toast notification displayed
 
 ### Error Handling
+
 - Permission denied: Button hidden/disabled
 - Network errors: Error toast with retry option
 - Validation errors: Form validation messages
@@ -163,6 +183,7 @@ interface Lead {
 ## Arabic RTL Support
 
 ### Implementation Details
+
 - All labels and text in Arabic
 - Proper RTL text direction
 - Icon positioning adjusted for RTL
@@ -170,6 +191,7 @@ interface Lead {
 - Date formatting in Arabic locale
 
 ### UI Components
+
 - Status badges with Arabic labels
 - Source dropdown with Arabic options
 - Form inputs with Arabic placeholders
@@ -178,6 +200,7 @@ interface Lead {
 ## Testing Considerations
 
 ### Manual Testing Checklist
+
 - [ ] Leads list loads with proper data
 - [ ] Search functionality works across name/email/company
 - [ ] Status and source filters work correctly
@@ -196,6 +219,7 @@ interface Lead {
 ## Future Enhancements
 
 ### Potential Improvements
+
 1. **Lead Details Page**: Full lead view with activity history
 2. **Bulk Operations**: Select multiple leads for bulk actions
 3. **Lead Import**: CSV/Excel import functionality
@@ -206,6 +230,7 @@ interface Lead {
 8. **Reporting**: Lead conversion analytics
 
 ### Technical Debt
+
 - Add comprehensive unit tests
 - Implement error boundaries
 - Add loading skeletons for better UX

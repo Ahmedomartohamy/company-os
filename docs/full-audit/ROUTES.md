@@ -1,11 +1,14 @@
 # Route Mapping & Protection Analysis
 
 ## Public Routes
+
 - `/login` → Login component (src/app/routes/Login.tsx)
 - `*` → NotFound component (src/app/NotFound.tsx)
 
 ## Protected Routes (require authentication)
+
 All routes below are wrapped in ProtectedRoute and AppShell:
+
 - `/` → Dashboard (src/app/routes/Dashboard.tsx)
 - `/clients` → ClientsPage (src/app/routes/Clients.tsx)
 - `/contacts` → ContactsList (src/modules/contacts/ContactsList.tsx)
@@ -19,10 +22,12 @@ All routes below are wrapped in ProtectedRoute and AppShell:
 - `/debug` → Debug (src/pages/Debug.tsx)
 
 ## Nested Routes
+
 - All protected routes are nested under ProtectedRoute (`/`) using React Router's Outlet pattern
 - Each protected route is wrapped in AppShell for consistent layout
 
 ## Route Protection Mechanism
+
 - **Primary Protection**: ProtectedRoute component (src/app/ProtectedRoute.tsx)
   - Uses `useAuth()` hook from AuthProvider
   - Checks `loading` state and `session` existence
@@ -32,4 +37,5 @@ All routes below are wrapped in ProtectedRoute and AppShell:
 - **Redirect Behavior**: Unauthenticated users are redirected to `/login` with `replace` flag
 
 ---
-*Format: path → component (protection status)*
+
+_Format: path → component (protection status)_

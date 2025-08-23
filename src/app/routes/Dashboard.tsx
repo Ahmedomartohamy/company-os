@@ -1,27 +1,50 @@
-import { KPI, Card, CardHeader } from "@/components/ui/Card";
-import { Users, BriefcaseBusiness, AlertTriangle, Activity, TrendingUp, DollarSign } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { getPipelineValue, getExpectedRevenue, getTasksDue } from "@/lib/dashboard";
-import { toast } from "sonner";
+import { KPI, Card, CardHeader } from '@/components/ui/Card';
+import {
+  Users,
+  BriefcaseBusiness,
+  AlertTriangle,
+  Activity,
+  TrendingUp,
+  DollarSign,
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getPipelineValue, getExpectedRevenue, getTasksDue } from '@/lib/dashboard';
+import { toast } from 'sonner';
 
 export default function Dashboard() {
   // Query for pipeline value
-  const { data: pipelineData, isLoading: pipelineLoading, error: pipelineError } = useQuery({
+  const {
+    data: pipelineData,
+    isLoading: pipelineLoading,
+    error: pipelineError,
+  } = useQuery({
     queryKey: ['dashboard', 'pipeline-value'],
-    queryFn: getPipelineValue
-  }) as { data: { pipeline_value: number } | undefined, isLoading: boolean, error: Error | null };
+    queryFn: getPipelineValue,
+  }) as { data: { pipeline_value: number } | undefined; isLoading: boolean; error: Error | null };
 
   // Query for expected revenue
-  const { data: revenueData, isLoading: revenueLoading, error: revenueError } = useQuery({
+  const {
+    data: revenueData,
+    isLoading: revenueLoading,
+    error: revenueError,
+  } = useQuery({
     queryKey: ['dashboard', 'expected-revenue'],
-    queryFn: getExpectedRevenue
-  }) as { data: { expected_revenue: number } | undefined, isLoading: boolean, error: Error | null };
+    queryFn: getExpectedRevenue,
+  }) as { data: { expected_revenue: number } | undefined; isLoading: boolean; error: Error | null };
 
   // Query for tasks due
-  const { data: tasksData, isLoading: tasksLoading, error: tasksError } = useQuery({
+  const {
+    data: tasksData,
+    isLoading: tasksLoading,
+    error: tasksError,
+  } = useQuery({
     queryKey: ['dashboard', 'tasks-due'],
-    queryFn: getTasksDue
-  }) as { data: { due_today: number, due_tomorrow: number } | undefined, isLoading: boolean, error: Error | null };
+    queryFn: getTasksDue,
+  }) as {
+    data: { due_today: number; due_tomorrow: number } | undefined;
+    isLoading: boolean;
+    error: Error | null;
+  };
 
   // Helper function to format currency
   const formatCurrency = (amount: number) => {
@@ -29,13 +52,13 @@ export default function Dashboard() {
       style: 'currency',
       currency: 'EGP',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   // Helper function to get display value with loading/error states
-  const getDisplayValue = (data: any, isLoading: boolean, error: any, fallback: string = "—") => {
-    if (isLoading) return "...";
+  const getDisplayValue = (data: any, isLoading: boolean, error: any, fallback: string = '—') => {
+    if (isLoading) return '...';
     if (error) return fallback;
     return data;
   };
@@ -43,33 +66,54 @@ export default function Dashboard() {
   return (
     <div className="grid gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <KPI 
-          label="قيمة البايبلاين" 
-          value={pipelineLoading ? "..." : pipelineError ? "—" : formatCurrency(pipelineData?.pipeline_value || 0)} 
-          icon={<TrendingUp className="w-5 h-5" />} 
+        <KPI
+          label="قيمة البايبلاين"
+          value={
+            pipelineLoading
+              ? '...'
+              : pipelineError
+                ? '—'
+                : formatCurrency(pipelineData?.pipeline_value || 0)
+          }
+          icon={<TrendingUp className="w-5 h-5" />}
         />
-        <KPI 
-          label="الإيراد المتوقع" 
-          value={revenueLoading ? "..." : revenueError ? "—" : formatCurrency(revenueData?.expected_revenue || 0)} 
-          icon={<DollarSign className="w-5 h-5" />} 
+        <KPI
+          label="الإيراد المتوقع"
+          value={
+            revenueLoading
+              ? '...'
+              : revenueError
+                ? '—'
+                : formatCurrency(revenueData?.expected_revenue || 0)
+          }
+          icon={<DollarSign className="w-5 h-5" />}
         />
-        <KPI 
-          label="مهام اليوم" 
-          value={getDisplayValue(tasksData?.due_today || 0, tasksLoading, tasksError)} 
-          icon={<AlertTriangle className="w-5 h-5" />} 
+        <KPI
+          label="مهام اليوم"
+          value={getDisplayValue(tasksData?.due_today || 0, tasksLoading, tasksError)}
+          icon={<AlertTriangle className="w-5 h-5" />}
         />
-        <KPI 
-          label="مهام الغد" 
-          value={getDisplayValue(tasksData?.due_tomorrow || 0, tasksLoading, tasksError)} 
-          icon={<Activity className="w-5 h-5" />} 
+        <KPI
+          label="مهام الغد"
+          value={getDisplayValue(tasksData?.due_tomorrow || 0, tasksLoading, tasksError)}
+          icon={<Activity className="w-5 h-5" />}
         />
       </div>
       <Card className="p-6">
         <CardHeader title="النشاط الأخير" icon={<Activity className="w-5 h-5" />} />
         <ul className="space-y-2 text-sm text-text-muted">
-          <li className="flex items-center gap-2"><BriefcaseBusiness className="w-4 h-4 text-brand"/><span>إنشاء مهمة "تحضير العرض" في مشروع "إعادة تصميم الموقع"</span></li>
-          <li className="flex items-center gap-2"><BriefcaseBusiness className="w-4 h-4 text-brand"/><span>تحديث حالة مشروع "تطبيق الموبايل" إلى مكتمل</span></li>
-          <li className="flex items-center gap-2"><Users className="w-4 h-4 text-brand"/><span>إضافة عميل جديد "أكمي"</span></li>
+          <li className="flex items-center gap-2">
+            <BriefcaseBusiness className="w-4 h-4 text-brand" />
+            <span>إنشاء مهمة "تحضير العرض" في مشروع "إعادة تصميم الموقع"</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <BriefcaseBusiness className="w-4 h-4 text-brand" />
+            <span>تحديث حالة مشروع "تطبيق الموبايل" إلى مكتمل</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-brand" />
+            <span>إضافة عميل جديد "أكمي"</span>
+          </li>
         </ul>
       </Card>
     </div>

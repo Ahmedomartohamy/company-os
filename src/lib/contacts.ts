@@ -14,7 +14,7 @@ export const ContactSchema = z.object({
   owner_id: z.string().uuid().optional(),
   notes: z.string().optional(),
   created_at: z.string().optional(),
-  updated_at: z.string().optional()
+  updated_at: z.string().optional(),
 });
 
 export type Contact = z.infer<typeof ContactSchema>;
@@ -46,21 +46,23 @@ const TABLE = 'contacts';
  */
 export async function listContacts(params: ListContactsParams = {}): Promise<ContactWithClient[]> {
   const { page = 1, limit = 25, ...filters } = params;
-  
+
   let query = supabase
     .from(TABLE)
-    .select(`
+    .select(
+      `
       *,
       client:clients(id, name),
       owner:profiles!contacts_owner_id_fkey(id, full_name)
-    `)
+    `,
+    )
     .order('created_at', { ascending: false });
 
   // Apply filters
   if (filters.clientId) {
     query = query.eq('client_id', filters.clientId);
   }
-  
+
   if (filters.ownerId) {
     query = query.eq('owner_id', filters.ownerId);
   }
@@ -68,7 +70,9 @@ export async function listContacts(params: ListContactsParams = {}): Promise<Con
   // Apply search - basic text search on name and email
   if (filters.q) {
     const searchTerm = `%${filters.q}%`;
-    query = query.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm}`);
+    query = query.or(
+      `first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm}`,
+    );
   }
 
   // Apply pagination using range
@@ -87,14 +91,16 @@ export async function listContacts(params: ListContactsParams = {}): Promise<Con
 export async function getContact(id: string): Promise<ContactWithClient> {
   const { data, error } = await supabase
     .from(TABLE)
-    .select(`
+    .select(
+      `
       *,
       client:clients(id, name),
       owner:profiles!contacts_owner_id_fkey(id, full_name)
-    `)
+    `,
+    )
     .eq('id', id)
     .single();
-  
+
   if (error) throw error;
   return data as ContactWithClient;
 }
@@ -105,18 +111,16 @@ export async function getContact(id: string): Promise<ContactWithClient> {
 export async function createContact(payload: Partial<Contact>): Promise<Contact> {
   // Get current user ID if owner_id not provided
   if (!payload.owner_id) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (user) {
       payload.owner_id = user.id;
     }
   }
 
-  const { data, error } = await supabase
-    .from(TABLE)
-    .insert(payload)
-    .select()
-    .single();
-  
+  const { data, error } = await supabase.from(TABLE).insert(payload).select().single();
+
   if (error) throw error;
   return data as Contact;
 }
@@ -125,13 +129,8 @@ export async function createContact(payload: Partial<Contact>): Promise<Contact>
  * Update an existing contact
  */
 export async function updateContact(id: string, payload: Partial<Contact>): Promise<Contact> {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .update(payload)
-    .eq('id', id)
-    .select()
-    .single();
-  
+  const { data, error } = await supabase.from(TABLE).update(payload).eq('id', id).select().single();
+
   if (error) throw error;
   return data as Contact;
 }
@@ -140,11 +139,8 @@ export async function updateContact(id: string, payload: Partial<Contact>): Prom
  * Delete a contact
  */
 export async function deleteContact(id: string): Promise<void> {
-  const { error } = await supabase
-    .from(TABLE)
-    .delete()
-    .eq('id', id);
-  
+  const { error } = await supabase.from(TABLE).delete().eq('id', id);
+
   if (error) throw error;
 }
 
@@ -156,7 +152,7 @@ export async function getContactsCountByClient(clientId: string): Promise<number
     .from(TABLE)
     .select('*', { count: 'exact', head: true })
     .eq('client_id', clientId);
-  
+
   if (error) throw error;
   return count || 0;
 }

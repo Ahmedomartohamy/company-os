@@ -16,6 +16,7 @@ This migration enables Row Level Security (RLS) on the `clients` and `contacts` 
 **Owner ID Detection**: The migration uses a dynamic helper function `_has_owner_id()` to detect if the table has an `owner_id` column at runtime.
 
 **Policies Created**:
+
 - `clients_read_all` - SELECT: All authenticated users can read
 - `clients_insert_roles` - INSERT: admin, sales_manager, sales_rep roles only
 - `clients_update_owner_or_mgr` OR `clients_update_mgr_only` - UPDATE: Owner-based if `owner_id` exists, otherwise manager-only
@@ -29,6 +30,7 @@ This migration enables Row Level Security (RLS) on the `clients` and `contacts` 
 **Owner ID Detection**: Dynamic detection using `_has_owner_id()` helper function
 
 **Policies Created**:
+
 - `contacts_read_all` - SELECT: All authenticated users can read
 - `contacts_insert_roles` - INSERT: admin, sales_manager, sales_rep roles only
 - `contacts_update_owner_or_mgr` OR `contacts_update_mgr_only` - UPDATE: Owner-based if `owner_id` exists, otherwise manager-only
@@ -39,47 +41,54 @@ This migration enables Row Level Security (RLS) on the `clients` and `contacts` 
 ## Security Model Implemented
 
 ### Access Control Matrix
-| Operation | Viewer | Sales Rep | Sales Manager | Admin |
-|-----------|--------|-----------|---------------|-------|
-| SELECT | ✅ | ✅ | ✅ | ✅ |
-| INSERT | ❌ | ✅ | ✅ | ✅ |
-| UPDATE | ❌ | ✅ (own records*) | ✅ | ✅ |
-| DELETE | ❌ | ❌ | ❌ | ✅ |
 
-*If `owner_id` column exists, users can update their own records
+| Operation | Viewer | Sales Rep          | Sales Manager | Admin |
+| --------- | ------ | ------------------ | ------------- | ----- |
+| SELECT    | ✅     | ✅                 | ✅            | ✅    |
+| INSERT    | ❌     | ✅                 | ✅            | ✅    |
+| UPDATE    | ❌     | ✅ (own records\*) | ✅            | ✅    |
+| DELETE    | ❌     | ❌                 | ❌            | ✅    |
+
+\*If `owner_id` column exists, users can update their own records
 
 ### Dynamic Owner Detection
 
 The migration includes a smart helper function `public._has_owner_id(tbl regclass)` that:
+
 - Checks if the specified table has an `owner_id` column
 - Enables conditional policy creation based on table structure
 - Allows the same migration to work across different table schemas
 
 **Update Policy Logic**:
+
 - **If `owner_id` exists**: Users can update records they own OR if they are admin/sales_manager
 - **If no `owner_id`**: Only admin and sales_manager roles can update
 
 ## Audit System
 
 ### Audit Function
+
 - **Function**: `public._audit_generic()`
 - **Captures**: INSERT, UPDATE, DELETE operations
 - **Logs**: Table name, row ID, action type, actor ID, and data diff
 - **Storage**: `public.audit_logs` table (assumed to exist)
 
 ### Audit Triggers
+
 - `trg_clients_audit` - Monitors all changes to clients table
 - `trg_contacts_audit` - Monitors all changes to contacts table
 
 ## Migration Features
 
 ### Idempotent Design
+
 - Uses `IF NOT EXISTS` for all policy creation
 - Uses `IF EXISTS` for table alterations
 - Safe to run multiple times without errors
 - Drops and recreates triggers to ensure consistency
 
 ### Error Handling
+
 - Wrapped in BEGIN/COMMIT transaction
 - Atomic operation - all changes succeed or fail together
 - No destructive operations (no DROP TABLE or similar)
@@ -90,7 +99,7 @@ The migration includes a smart helper function `public._has_owner_id(tbl regclas
 ✅ **Role-Based Access**: Enforces business rules at database level  
 ✅ **Audit Trail**: Complete logging of all data modifications  
 ✅ **Owner Privacy**: Users can only modify their own records (when applicable)  
-✅ **Admin Control**: Admins retain full control over data lifecycle  
+✅ **Admin Control**: Admins retain full control over data lifecycle
 
 ## Next Steps
 

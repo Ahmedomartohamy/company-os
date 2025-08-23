@@ -11,6 +11,7 @@ This document explains all environment variables used in the application and how
 **Format**: `https://[project-id].supabase.co`
 
 **How to get this value**:
+
 1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Select your project
 3. Navigate to **Settings** → **API**
@@ -25,6 +26,7 @@ This document explains all environment variables used in the application and how
 **Format**: Long base64-encoded string starting with `eyJ`
 
 **How to get this value**:
+
 1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Select your project
 3. Navigate to **Settings** → **API**
@@ -39,6 +41,7 @@ This document explains all environment variables used in the application and how
 **Description**: Specifies the current application environment. Used for environment-specific behavior and debugging.
 
 **Allowed Values**:
+
 - `development` - Local development environment
 - `staging` - Staging/preview environment
 - `production` - Production environment
@@ -46,6 +49,7 @@ This document explains all environment variables used in the application and how
 **Default**: `development` (if not specified)
 
 **Usage in code**:
+
 ```typescript
 const isProduction = import.meta.env.VITE_APP_ENV === 'production';
 const isDevelopment = import.meta.env.VITE_APP_ENV === 'development';
@@ -54,11 +58,13 @@ const isDevelopment = import.meta.env.VITE_APP_ENV === 'development';
 ## Local Development Setup
 
 1. **Copy the example file**:
+
    ```bash
    cp .env.example .env.local
    ```
 
 2. **Fill in your Supabase credentials**:
+
    ```env
    VITE_SUPABASE_URL=https://your-project-id.supabase.co
    VITE_SUPABASE_ANON_KEY=your-anon-key-here
@@ -107,11 +113,12 @@ vercel --prod
 }
 ```
 
-*Note: Use Vercel's secret management for sensitive values with the `@` prefix.*
+_Note: Use Vercel's secret management for sensitive values with the `@` prefix._
 
 ## Environment-Specific Configurations
 
 ### Development
+
 ```env
 VITE_SUPABASE_URL=https://your-dev-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-dev-anon-key
@@ -119,6 +126,7 @@ VITE_APP_ENV=development
 ```
 
 ### Staging
+
 ```env
 VITE_SUPABASE_URL=https://your-staging-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-staging-anon-key
@@ -126,6 +134,7 @@ VITE_APP_ENV=staging
 ```
 
 ### Production
+
 ```env
 VITE_SUPABASE_URL=https://your-prod-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-prod-anon-key
@@ -135,11 +144,13 @@ VITE_APP_ENV=production
 ## Security Considerations
 
 ### Safe to Expose (Client-Side)
+
 - ✅ `VITE_SUPABASE_URL` - Public API endpoint
 - ✅ `VITE_SUPABASE_ANON_KEY` - Public key with RLS protection
 - ✅ `VITE_APP_ENV` - Environment identifier
 
 ### Never Expose (Server-Side Only)
+
 - ❌ `SUPABASE_SERVICE_ROLE_KEY` - Full database access (not used in this app)
 - ❌ Database passwords or connection strings
 - ❌ Third-party API secrets
@@ -159,14 +170,17 @@ VITE_APP_ENV=production
 ### Common Issues
 
 **"Failed to connect to Supabase"**
+
 - Verify `VITE_SUPABASE_URL` is correct and accessible
 - Check that your Supabase project is active
 
 **"Invalid API key"**
+
 - Verify `VITE_SUPABASE_ANON_KEY` is the correct anon/public key
 - Ensure the key hasn't been regenerated in Supabase
 
 **"Environment variable not found"**
+
 - Ensure the variable name starts with `VITE_`
 - Restart your development server after adding new variables
 - Check that the variable is defined in your environment

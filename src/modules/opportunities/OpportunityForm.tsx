@@ -8,12 +8,12 @@ import Select from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useFormZod } from '@/hooks/useFormZod';
 
-import { 
-  OpportunitySchema, 
-  createOpportunity, 
-  updateOpportunity, 
-  type Opportunity, 
-  type OpportunityWithDetails 
+import {
+  OpportunitySchema,
+  createOpportunity,
+  updateOpportunity,
+  type Opportunity,
+  type OpportunityWithDetails,
 } from '@/lib/opportunities';
 import { listClients } from '@/services/clientsService';
 import { listContacts } from '@/lib/contacts';
@@ -28,12 +28,12 @@ interface OpportunityFormProps {
   stages?: Array<{ id: string; name: string; probability: number }>; // Available stages
 }
 
-export function OpportunityForm({ 
-  opportunity, 
-  onSuccess, 
-  onCancel, 
+export function OpportunityForm({
+  opportunity,
+  onSuccess,
+  onCancel,
   defaultStageId,
-  stages = []
+  stages = [],
 }: OpportunityFormProps) {
   const queryClient = useQueryClient();
   const { can } = useAuthz();
@@ -50,13 +50,13 @@ export function OpportunityForm({
     close_date: opportunity?.close_date || '',
     owner_id: opportunity?.owner_id || user?.id || '',
     contact_id: opportunity?.contact_id || '',
-    notes: opportunity?.notes || ''
+    notes: opportunity?.notes || '',
   });
 
   // Fetch clients for dropdown
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
-    queryFn: listClients
+    queryFn: listClients,
   });
 
   // Fetch contacts for dropdown (filtered by selected client)
@@ -64,7 +64,7 @@ export function OpportunityForm({
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts', { clientId: selectedClientId }],
     queryFn: () => listContacts({ clientId: selectedClientId || undefined }),
-    enabled: !!selectedClientId
+    enabled: !!selectedClientId,
   });
 
   // Create mutation
@@ -79,12 +79,12 @@ export function OpportunityForm({
     onError: (error) => {
       console.error('Error creating opportunity:', error);
       toast.error('حدث خطأ أثناء إنشاء الفرصة');
-    }
+    },
   });
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Opportunity> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<Opportunity> }) =>
       updateOpportunity(id, data),
     onSuccess: (_, { id }) => {
       toast.success('تم تحديث الفرصة بنجاح');
@@ -102,7 +102,7 @@ export function OpportunityForm({
   const handleSubmit = (data: Opportunity) => {
     // Validate contact-client relationship if contact is selected
     if (data.contact_id && data.client_id) {
-      const selectedContact = contacts.find(c => c.id === data.contact_id);
+      const selectedContact = contacts.find((c) => c.id === data.contact_id);
       if (selectedContact && selectedContact.client_id !== data.client_id) {
         toast.error('جهة الاتصال المختارة لا تنتمي للعميل المحدد');
         return;
@@ -131,7 +131,7 @@ export function OpportunityForm({
     { value: 'EGP', label: 'جنيه مصري (EGP)' },
     { value: 'SAR', label: 'ريال سعودي (SAR)' },
     { value: 'USD', label: 'دولار أمريكي (USD)' },
-    { value: 'EUR', label: 'يورو (EUR)' }
+    { value: 'EUR', label: 'يورو (EUR)' },
   ];
 
   return (
@@ -152,10 +152,12 @@ export function OpportunityForm({
         <Select
           label="العميل *"
           placeholder="اختر العميل"
-          options={clients.filter(client => client.id).map(client => ({
-            value: client.id!,
-            label: client.name
-          }))}
+          options={clients
+            .filter((client) => client.id)
+            .map((client) => ({
+              value: client.id!,
+              label: client.name,
+            }))}
           {...form.register('client_id')}
           error={form.formState.errors.client_id?.message}
           disabled={isLoading}
@@ -170,10 +172,10 @@ export function OpportunityForm({
             placeholder="اختر جهة الاتصال (اختياري)"
             options={[
               { value: '', label: 'بدون جهة اتصال' },
-              ...contacts.map(contact => ({
+              ...contacts.map((contact) => ({
                 value: contact.id!,
-                label: `${contact.first_name} ${contact.last_name || ''}`.trim()
-              }))
+                label: `${contact.first_name} ${contact.last_name || ''}`.trim(),
+              })),
             ]}
             {...form.register('contact_id')}
             error={form.formState.errors.contact_id?.message}
@@ -188,9 +190,9 @@ export function OpportunityForm({
           <Select
             label="المرحلة *"
             placeholder="اختر المرحلة"
-            options={stages.map(stage => ({
+            options={stages.map((stage) => ({
               value: stage.id,
-              label: `${stage.name} (${stage.probability}%)`
+              label: `${stage.name} (${stage.probability}%)`,
             }))}
             {...form.register('stage_id')}
             error={form.formState.errors.stage_id?.message}
@@ -263,19 +265,10 @@ export function OpportunityForm({
 
       {/* Form Actions */}
       <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           إلغاء
         </Button>
-        <Button
-          type="submit"
-          loading={isLoading}
-          disabled={!form.formState.isValid}
-        >
+        <Button type="submit" loading={isLoading} disabled={!form.formState.isValid}>
           {isEditing ? 'تحديث الفرصة' : 'إنشاء الفرصة'}
         </Button>
       </div>

@@ -64,14 +64,14 @@ export default function Debug() {
 
   const appEnv = import.meta.env.VITE_APP_ENV || 'development';
   const appVersion = '0.2.0'; // From package.json
-  const sessionExpiresAt = session?.expires_at 
+  const sessionExpiresAt = session?.expires_at
     ? new Date(session.expires_at * 1000).toLocaleString()
     : 'N/A';
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Debug Information</h1>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* User Information */}
         <div className="bg-white rounded-lg border p-4">
@@ -92,10 +92,7 @@ export default function Debug() {
             <div>
               <span className="font-medium">Last Sign In:</span>
               <span className="ml-2">
-                {user?.last_sign_in_at 
-                  ? new Date(user.last_sign_in_at).toLocaleString()
-                  : 'N/A'
-                }
+                {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'N/A'}
               </span>
             </div>
           </div>
@@ -142,9 +139,7 @@ export default function Debug() {
             </div>
             <div>
               <span className="font-medium">Access Token:</span>
-              <span className="ml-2 font-mono text-xs">
-                {maskToken(session?.access_token)}
-              </span>
+              <span className="ml-2 font-mono text-xs">{maskToken(session?.access_token)}</span>
             </div>
             <div>
               <span className="font-medium">Token Type:</span>
@@ -156,9 +151,7 @@ export default function Debug() {
             </div>
             <div>
               <span className="font-medium">Refresh Token:</span>
-              <span className="ml-2 font-mono text-xs">
-                {maskToken(session?.refresh_token)}
-              </span>
+              <span className="ml-2 font-mono text-xs">{maskToken(session?.refresh_token)}</span>
             </div>
           </div>
         </div>
@@ -193,11 +186,17 @@ export default function Debug() {
       <div className="mt-6 bg-gray-50 rounded-lg border p-4">
         <h2 className="text-lg font-semibold mb-4">Raw Session Data (Tokens Masked)</h2>
         <pre className="text-xs overflow-auto bg-white p-3 rounded border">
-          {JSON.stringify(session ? {
-            ...session,
-            access_token: maskToken(session.access_token),
-            refresh_token: maskToken(session.refresh_token)
-          } : null, null, 2)}
+          {JSON.stringify(
+            session
+              ? {
+                  ...session,
+                  access_token: maskToken(session.access_token),
+                  refresh_token: maskToken(session.refresh_token),
+                }
+              : null,
+            null,
+            2,
+          )}
         </pre>
       </div>
     </div>

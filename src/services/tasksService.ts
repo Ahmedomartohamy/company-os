@@ -3,7 +3,10 @@ import type { Task } from '@/types/task';
 const TABLE = 'tasks';
 
 export async function listTasks(): Promise<Task[]> {
-  const { data, error } = await supabase.from(TABLE).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data as Task[];
 }

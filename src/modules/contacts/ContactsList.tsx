@@ -23,10 +23,10 @@ interface ContactsListProps {
   showAddButton?: boolean;
 }
 
-export default function ContactsList({ 
-  clientId, 
-  title = 'جهات الاتصال', 
-  showAddButton = true 
+export default function ContactsList({
+  clientId,
+  title = 'جهات الاتصال',
+  showAddButton = true,
 }: ContactsListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClientId, setSelectedClientId] = useState(clientId || '');
@@ -37,22 +37,30 @@ export default function ContactsList({
   const [contactToDelete, setContactToDelete] = useState<ContactWithClient | null>(null);
   const [page, setPage] = useState(1);
   const [allContacts, setAllContacts] = useState<ContactWithClient[]>([]);
-  
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can } = useAuthz();
 
   // Fetch contacts with filters and pagination
-  const { data: contacts = [], isLoading, isFetching } = useQuery({
-    queryKey: ['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId, page }],
-    queryFn: () => listContacts({ 
-      q: searchQuery || undefined, 
-      clientId: selectedClientId || undefined,
-      ownerId: selectedOwnerId || undefined,
-      page,
-      limit: 25
-    })
-  }) as { data: ContactWithClient[], isLoading: boolean, isFetching: boolean };
+  const {
+    data: contacts = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: [
+      'contacts',
+      { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId, page },
+    ],
+    queryFn: () =>
+      listContacts({
+        q: searchQuery || undefined,
+        clientId: selectedClientId || undefined,
+        ownerId: selectedOwnerId || undefined,
+        page,
+        limit: 25,
+      }),
+  }) as { data: ContactWithClient[]; isLoading: boolean; isFetching: boolean };
 
   // Handle data updates when contacts change
   useEffect(() => {
@@ -60,7 +68,7 @@ export default function ContactsList({
       if (page === 1) {
         setAllContacts(contacts);
       } else {
-        setAllContacts(prev => [...prev, ...contacts]);
+        setAllContacts((prev) => [...prev, ...contacts]);
       }
     }
   }, [contacts, page]);
@@ -89,7 +97,7 @@ export default function ContactsList({
 
   // Load more contacts
   const loadMore = () => {
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
   };
 
   // Check if there are more contacts to load
@@ -100,7 +108,7 @@ export default function ContactsList({
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
     queryFn: listClients,
-    enabled: !clientId // Only fetch if not filtering by specific client
+    enabled: !clientId, // Only fetch if not filtering by specific client
   });
 
   // Delete mutation with optimistic updates
@@ -109,16 +117,19 @@ export default function ContactsList({
     onMutate: async (contactId) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['contacts'] });
-      
+
       // Snapshot previous value
-      const previousContacts = queryClient.getQueryData(['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId }]);
-      
+      const previousContacts = queryClient.getQueryData([
+        'contacts',
+        { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId },
+      ]);
+
       // Optimistically remove contact
       queryClient.setQueryData(
         ['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId }],
-        (old: ContactWithClient[] = []) => old.filter(c => c.id !== contactId)
+        (old: ContactWithClient[] = []) => old.filter((c) => c.id !== contactId),
       );
-      
+
       return { previousContacts };
     },
     onError: (err, contactId, context) => {
@@ -126,7 +137,7 @@ export default function ContactsList({
       if (context?.previousContacts) {
         queryClient.setQueryData(
           ['contacts', { q: searchQuery, clientId: selectedClientId, ownerId: selectedOwnerId }],
-          context.previousContacts
+          context.previousContacts,
         );
       }
       toast.error('حدث خطأ أثناء حذف جهة الاتصال');
@@ -139,7 +150,7 @@ export default function ContactsList({
     onSettled: () => {
       // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-    }
+    },
   });
 
   const handleView = (contact: ContactWithClient) => {
@@ -199,15 +210,12 @@ export default function ContactsList({
             onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
-        
+
         {!clientId && (
           <div className="min-w-[150px]">
-            <Select
-              value={selectedClientId}
-              onChange={(e) => handleClientChange(e.target.value)}
-            >
+            <Select value={selectedClientId} onChange={(e) => handleClientChange(e.target.value)}>
               <option value="">جميع العملاء</option>
-              {clients.map(client => (
+              {clients.map((client) => (
                 <option key={client.id} value={client.id}>
                   {client.name}
                 </option>
@@ -233,7 +241,7 @@ export default function ContactsList({
                   <div className="text-sm text-gray-500">{contact.position}</div>
                 )}
               </div>
-            )
+            ),
           },
           {
             key: 'client',
@@ -245,20 +253,20 @@ export default function ContactsList({
                   <div className="text-sm text-gray-500">{contact.company}</div>
                 )}
               </div>
-            )
+            ),
           },
           { key: 'email', header: 'البريد الإلكتروني' },
           { key: 'phone', header: 'الهاتف' },
           {
             key: 'owner',
             header: 'المسؤول',
-            render: (contact: ContactWithClient) => contact.owner?.full_name || '-'
+            render: (contact: ContactWithClient) => contact.owner?.full_name || '-',
           },
           {
             key: 'created_at',
             header: 'تاريخ الإنشاء',
-            render: (contact: ContactWithClient) => 
-              contact.created_at ? new Date(contact.created_at).toLocaleDateString('ar-SA') : '-'
+            render: (contact: ContactWithClient) =>
+              contact.created_at ? new Date(contact.created_at).toLocaleDateString('ar-SA') : '-',
           },
           {
             key: 'id' as keyof ContactWithClient,
@@ -296,8 +304,8 @@ export default function ContactsList({
                   </Button>
                 )}
               </div>
-            )
-          }
+            ),
+          },
         ]}
         loading={isLoading}
       />
@@ -305,11 +313,7 @@ export default function ContactsList({
       {/* Load More Button */}
       {hasMore && (
         <div className="flex justify-center mt-4">
-          <Button
-            variant="secondary"
-            onClick={loadMore}
-            disabled={isFetching}
-          >
+          <Button variant="secondary" onClick={loadMore} disabled={isFetching}>
             {isFetching ? 'جاري التحميل...' : 'عرض المزيد'}
           </Button>
         </div>

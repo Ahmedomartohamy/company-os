@@ -5,7 +5,11 @@ import { listPipelines } from '@/lib/opportunities';
 import { Loader2, ExternalLink } from 'lucide-react';
 
 export function PipelineDebug() {
-  const { data: pipelines, isLoading, error } = useQuery({
+  const {
+    data: pipelines,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['pipelines'],
     queryFn: listPipelines,
   });
@@ -24,7 +28,9 @@ export function PipelineDebug() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-red-600 mb-2">خطأ في تحميل الأنابيب</h2>
-          <p className="text-gray-600">{error instanceof Error ? error.message : 'خطأ غير معروف'}</p>
+          <p className="text-gray-600">
+            {error instanceof Error ? error.message : 'خطأ غير معروف'}
+          </p>
         </div>
       </div>
     );
@@ -33,7 +39,7 @@ export function PipelineDebug() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">اختبار الأنابيب - Pipeline Debug</h1>
-      
+
       {!pipelines || pipelines.length === 0 ? (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-yellow-800 mb-2">لا توجد أنابيب</h2>
@@ -43,7 +49,8 @@ export function PipelineDebug() {
           <div className="bg-gray-100 p-4 rounded-md">
             <h3 className="font-semibold mb-2">لتشغيل سكريبت البذر:</h3>
             <code className="text-sm">
-              -- في قاعدة البيانات، قم بتشغيل محتوى ملف:<br/>
+              -- في قاعدة البيانات، قم بتشغيل محتوى ملف:
+              <br />
               supabase/SEED_PIPELINE.sql
             </code>
           </div>
@@ -53,16 +60,17 @@ export function PipelineDebug() {
           <p className="text-gray-600 mb-4">
             تم العثور على {pipelines.length} أنبوب(ة). اختر أحدها لعرض لوحة Kanban:
           </p>
-          
+
           {pipelines.map((pipeline) => (
-            <div key={pipeline.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div
+              key={pipeline.id}
+              className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">{pipeline.name}</h3>
                   <p className="text-sm text-gray-500">ID: {pipeline.id}</p>
-                  <p className="text-sm text-gray-500">
-                    المراحل: {pipeline.stages?.length || 0}
-                  </p>
+                  <p className="text-sm text-gray-500">المراحل: {pipeline.stages?.length || 0}</p>
                 </div>
                 <Link
                   to={`/pipeline/${pipeline.id}`}
@@ -72,7 +80,7 @@ export function PipelineDebug() {
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
               </div>
-              
+
               {pipeline.stages && pipeline.stages.length > 0 && (
                 <div className="mt-4">
                   <h4 className="font-medium mb-2">المراحل:</h4>
@@ -92,13 +100,19 @@ export function PipelineDebug() {
           ))}
         </div>
       )}
-      
+
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
         <h2 className="text-lg font-semibold text-blue-800 mb-2">معلومات التطوير</h2>
         <div className="text-sm text-blue-700 space-y-2">
-          <p><strong>المسار الحالي:</strong> /pipeline-debug</p>
-          <p><strong>مسار لوحة Kanban:</strong> /pipeline/:pipelineId</p>
-          <p><strong>مثال على مسار صحيح:</strong> /pipeline/[UUID من الجدول أعلاه]</p>
+          <p>
+            <strong>المسار الحالي:</strong> /pipeline-debug
+          </p>
+          <p>
+            <strong>مسار لوحة Kanban:</strong> /pipeline/:pipelineId
+          </p>
+          <p>
+            <strong>مثال على مسار صحيح:</strong> /pipeline/[UUID من الجدول أعلاه]
+          </p>
         </div>
       </div>
     </div>

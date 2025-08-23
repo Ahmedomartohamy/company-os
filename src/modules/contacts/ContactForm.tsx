@@ -8,7 +8,13 @@ import Select from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useFormZod } from '@/hooks/useFormZod';
 
-import { ContactSchema, createContact, updateContact, type Contact, type ContactWithClient } from '@/lib/contacts';
+import {
+  ContactSchema,
+  createContact,
+  updateContact,
+  type Contact,
+  type ContactWithClient,
+} from '@/lib/contacts';
 import { listClients } from '@/services/clientsService';
 import { useAuthz } from '@/lib/useAuthz';
 
@@ -19,11 +25,11 @@ interface ContactFormProps {
   defaultClientId?: string; // When creating from client details
 }
 
-export default function ContactForm({ 
-  contact, 
-  onSuccess, 
-  onCancel, 
-  defaultClientId 
+export default function ContactForm({
+  contact,
+  onSuccess,
+  onCancel,
+  defaultClientId,
 }: ContactFormProps) {
   const queryClient = useQueryClient();
   const { can } = useAuthz();
@@ -38,13 +44,13 @@ export default function ContactForm({
     company: contact?.company || '',
     position: contact?.position || '',
     client_id: contact?.client_id || defaultClientId || '',
-    notes: contact?.notes || ''
+    notes: contact?.notes || '',
   });
 
   // Fetch clients for dropdown
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
-    queryFn: listClients
+    queryFn: listClients,
   });
 
   // Create mutation with optimistic updates
@@ -53,7 +59,7 @@ export default function ContactForm({
     onMutate: async (newContact) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['contacts'] });
-      
+
       // Create optimistic contact
       const optimisticContact: ContactWithClient = {
         ...newContact,
@@ -62,26 +68,24 @@ export default function ContactForm({
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         client: (() => {
-          const foundClient = clients.find(c => c.id === newContact.client_id);
+          const foundClient = clients.find((c) => c.id === newContact.client_id);
           return foundClient ? { id: foundClient.id!, name: foundClient.name } : undefined;
-        })()
+        })(),
       };
-      
+
       // Add to all relevant queries
-      queryClient.setQueriesData(
-        { queryKey: ['contacts'] },
-        (old: ContactWithClient[] = []) => [optimisticContact, ...old]
-      );
-      
+      queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: ContactWithClient[] = []) => [
+        optimisticContact,
+        ...old,
+      ]);
+
       return { optimisticContact };
     },
     onError: (err, newContact, context) => {
       // Remove optimistic contact on error
       if (context?.optimisticContact) {
-        queryClient.setQueriesData(
-          { queryKey: ['contacts'] },
-          (old: ContactWithClient[] = []) => 
-            old.filter(c => c.id !== context.optimisticContact.id)
+        queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: ContactWithClient[] = []) =>
+          old.filter((c) => c.id !== context.optimisticContact.id),
         );
       }
       toast.error('حدث خطأ أثناء إضافة جهة الاتصال');
@@ -93,27 +97,24 @@ export default function ContactForm({
     onSettled: () => {
       // Always refetch to get real data
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-    }
+    },
   });
 
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Contact> }) => 
-      updateContact(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Contact> }) => updateContact(id, data),
     onMutate: async ({ id, data }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['contacts'] });
-      
+
       // Snapshot previous value
       const previousContacts = queryClient.getQueriesData({ queryKey: ['contacts'] });
-      
+
       // Optimistically update contact
-      queryClient.setQueriesData(
-        { queryKey: ['contacts'] },
-        (old: ContactWithClient[] = []) => 
-          old.map(c => c.id === id ? { ...c, ...data, updated_at: new Date().toISOString() } : c)
+      queryClient.setQueriesData({ queryKey: ['contacts'] }, (old: ContactWithClient[] = []) =>
+        old.map((c) => (c.id === id ? { ...c, ...data, updated_at: new Date().toISOString() } : c)),
       );
-      
+
       return { previousContacts };
     },
     onError: (err, variables, context) => {
@@ -132,7 +133,7 @@ export default function ContactForm({
     onSettled: () => {
       // Always refetch to get real data
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-    }
+    },
   });
 
   // Reset form when contact changes
@@ -146,7 +147,7 @@ export default function ContactForm({
         company: contact.company || '',
         position: contact.position || '',
         client_id: contact.client_id || '',
-        notes: contact.notes || ''
+        notes: contact.notes || '',
       });
     }
   }, [contact, form]);
@@ -230,12 +231,9 @@ export default function ContactForm({
 
       {/* Client Selection */}
       <div>
-        <Select
-          {...form.register('client_id')}
-          error={form.formState.errors.client_id?.message}
-        >
+        <Select {...form.register('client_id')} error={form.formState.errors.client_id?.message}>
           <option value="">اختر العميل (اختياري)</option>
-          {clients.map(client => (
+          {clients.map((client) => (
             <option key={client.id} value={client.id}>
               {client.name}
             </option>
@@ -255,19 +253,11 @@ export default function ContactForm({
 
       {/* Form Actions */}
       <div className="flex justify-end gap-3 pt-4">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
           إلغاء
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading ? 'جاري الحفظ...' : (isEditing ? 'تعديل' : 'إضافة')}
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'جاري الحفظ...' : isEditing ? 'تعديل' : 'إضافة'}
         </Button>
       </div>
     </form>

@@ -16,7 +16,8 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     const { error } = await signInWithEmail(email, password);
     setLoading(false);
     if (error) setError(error.message);
@@ -28,10 +29,24 @@ export default function Login() {
       <form onSubmit={onSubmit} className="w-full max-w-sm bg-white p-6 rounded-2xl shadow">
         <h1 className="text-xl font-semibold mb-4 text-center">تسجيل الدخول</h1>
         <div className="space-y-3">
-          <Input type="email" placeholder="البريد الإلكتروني" value={email} onChange={e=>setEmail(e.target.value)} required />
-          <Input type="password" placeholder="كلمة المرور" value={password} onChange={e=>setPassword(e.target.value)} required />
+          <Input
+            type="email"
+            placeholder="البريد الإلكتروني"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="كلمة المرور"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           {error && <div className="text-red-600 text-sm">{error}</div>}
-          <Button type="submit" disabled={loading} className="w-full">{loading ? 'جاري الدخول...' : 'دخول'}</Button>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'جاري الدخول...' : 'دخول'}
+          </Button>
         </div>
       </form>
     </div>

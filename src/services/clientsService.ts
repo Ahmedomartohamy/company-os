@@ -4,7 +4,10 @@ import type { Client } from '@/types/client';
 const TABLE = 'clients';
 
 export async function listClients(): Promise<Client[]> {
-  const { data, error } = await supabase.from(TABLE).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data as Client[];
 }

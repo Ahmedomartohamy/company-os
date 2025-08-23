@@ -15,7 +15,7 @@ import {
   Target,
   TrendingUp,
   FileText,
-  Plus
+  Plus,
 } from 'lucide-react';
 import { getOpportunity, deleteOpportunity, OpportunityWithDetails } from '@/lib/opportunities';
 import { useAuthz } from '@/lib/useAuthz';
@@ -29,7 +29,7 @@ export function OpportunityDetails() {
   const { can } = useAuthz();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  
+
   const [opportunity, setOpportunity] = useState<OpportunityWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,17 +48,17 @@ export function OpportunityDetails() {
 
   const loadOpportunity = async () => {
     if (!id) return;
-    
+
     try {
       setLoading(true);
       setError(null);
       const data = await getOpportunity(id);
-      
+
       if (!data) {
         setError('الفرصة غير موجودة');
         return;
       }
-      
+
       setOpportunity(data);
     } catch (err) {
       console.error('Error loading opportunity:', err);
@@ -70,7 +70,7 @@ export function OpportunityDetails() {
 
   const handleDelete = async () => {
     if (!id || !opportunity) return;
-    
+
     try {
       await deleteOpportunity(id);
       // Invalidate queries after successful deletion
@@ -175,7 +175,7 @@ export function OpportunityDetails() {
             <p className="text-gray-600 mt-1">تفاصيل الفرصة التجارية</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {canUpdate && (
             <button
@@ -205,7 +205,7 @@ export function OpportunityDetails() {
           {/* Basic Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">المعلومات الأساسية</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
                 <DollarSign className="h-5 w-5 text-green-600" />
@@ -216,7 +216,7 @@ export function OpportunityDetails() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <TrendingUp className={`h-5 w-5 ${getProbabilityColor(opportunity.probability)}`} />
                 <div>
@@ -226,20 +226,24 @@ export function OpportunityDetails() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-blue-600" />
                 <div>
                   <p className="text-sm text-gray-600">تاريخ الإغلاق المتوقع</p>
-                  <p className="font-semibold text-gray-900">{formatDate(opportunity.close_date)}</p>
+                  <p className="font-semibold text-gray-900">
+                    {formatDate(opportunity.close_date)}
+                  </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Target className="h-5 w-5 text-purple-600" />
                 <div>
                   <p className="text-sm text-gray-600">الحالة</p>
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(opportunity.status)}`}>
+                  <span
+                    className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(opportunity.status)}`}
+                  >
                     {getStatusText(opportunity.status)}
                   </span>
                 </div>
@@ -255,7 +259,9 @@ export function OpportunityDetails() {
                 <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
                 <div>
                   <p className="font-semibold text-gray-900">{opportunity.stage.name}</p>
-                  <p className="text-sm text-gray-600">احتمالية المرحلة: {opportunity.stage.probability}%</p>
+                  <p className="text-sm text-gray-600">
+                    احتمالية المرحلة: {opportunity.stage.probability}%
+                  </p>
                 </div>
               </div>
             </div>

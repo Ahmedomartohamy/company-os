@@ -23,9 +23,9 @@ interface LeadsListProps {
   showAddButton?: boolean;
 }
 
-export default function LeadsList({ 
-  title = 'العملاء المحتملون', 
-  showAddButton = true 
+export default function LeadsList({
+  title = 'العملاء المحتملون',
+  showAddButton = true,
 }: LeadsListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -39,23 +39,37 @@ export default function LeadsList({
   const [leadToConvert, setLeadToConvert] = useState<LeadWithOwner | null>(null);
   const [page, setPage] = useState(1);
   const [allLeads, setAllLeads] = useState<LeadWithOwner[]>([]);
-  
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { can } = useAuthz();
 
   // Fetch leads with filters and pagination
-  const { data: leads = [], isLoading, isFetching } = useQuery({
-    queryKey: ['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId, page }],
-    queryFn: () => listLeads({ 
-      q: searchQuery || undefined, 
-      status: selectedStatus || undefined,
-      source: selectedSource || undefined,
-      ownerId: selectedOwnerId || undefined,
-      page,
-      limit: 25
-    })
-  }) as { data: LeadWithOwner[], isLoading: boolean, isFetching: boolean };
+  const {
+    data: leads = [],
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: [
+      'leads',
+      {
+        q: searchQuery,
+        status: selectedStatus,
+        source: selectedSource,
+        ownerId: selectedOwnerId,
+        page,
+      },
+    ],
+    queryFn: () =>
+      listLeads({
+        q: searchQuery || undefined,
+        status: selectedStatus || undefined,
+        source: selectedSource || undefined,
+        ownerId: selectedOwnerId || undefined,
+        page,
+        limit: 25,
+      }),
+  }) as { data: LeadWithOwner[]; isLoading: boolean; isFetching: boolean };
 
   // Handle data updates when leads change
   useEffect(() => {
@@ -63,7 +77,7 @@ export default function LeadsList({
       if (page === 1) {
         setAllLeads(leads);
       } else {
-        setAllLeads(prev => [...prev, ...leads]);
+        setAllLeads((prev) => [...prev, ...leads]);
       }
     }
   }, [leads, page]);
@@ -97,7 +111,7 @@ export default function LeadsList({
 
   // Load more leads
   const loadMore = () => {
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
   };
 
   // Check if there are more leads to load
@@ -110,24 +124,48 @@ export default function LeadsList({
     onMutate: async (leadId) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['leads'] });
-      
+
       // Snapshot previous value
-      const previousLeads = queryClient.getQueryData(['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId }]);
-      
+      const previousLeads = queryClient.getQueryData([
+        'leads',
+        {
+          q: searchQuery,
+          status: selectedStatus,
+          source: selectedSource,
+          ownerId: selectedOwnerId,
+        },
+      ]);
+
       // Optimistically remove lead
       queryClient.setQueryData(
-        ['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId }],
-        (old: LeadWithOwner[] = []) => old.filter(l => l.id !== leadId)
+        [
+          'leads',
+          {
+            q: searchQuery,
+            status: selectedStatus,
+            source: selectedSource,
+            ownerId: selectedOwnerId,
+          },
+        ],
+        (old: LeadWithOwner[] = []) => old.filter((l) => l.id !== leadId),
       );
-      
+
       return { previousLeads };
     },
     onError: (err, leadId, context) => {
       // Rollback on error
       if (context?.previousLeads) {
         queryClient.setQueryData(
-          ['leads', { q: searchQuery, status: selectedStatus, source: selectedSource, ownerId: selectedOwnerId }],
-          context.previousLeads
+          [
+            'leads',
+            {
+              q: searchQuery,
+              status: selectedStatus,
+              source: selectedSource,
+              ownerId: selectedOwnerId,
+            },
+          ],
+          context.previousLeads,
         );
       }
       toast.error('حدث خطأ أثناء حذف العميل المحتمل');
@@ -140,7 +178,7 @@ export default function LeadsList({
     onSettled: () => {
       // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: ['leads'] });
-    }
+    },
   });
 
   const handleView = (lead: LeadWithOwner) => {
@@ -202,9 +240,9 @@ export default function LeadsList({
       new: { label: 'جديد', variant: 'default' as const },
       contacted: { label: 'تم التواصل', variant: 'secondary' as const },
       qualified: { label: 'مؤهل', variant: 'success' as const },
-      unqualified: { label: 'غير مؤهل', variant: 'destructive' as const }
+      unqualified: { label: 'غير مؤهل', variant: 'destructive' as const },
     };
-    
+
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.new;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
@@ -216,9 +254,9 @@ export default function LeadsList({
       ads: 'إعلانات',
       social: 'وسائل التواصل',
       cold_call: 'اتصال بارد',
-      other: 'أخرى'
+      other: 'أخرى',
     };
-    
+
     return sourceLabels[source as keyof typeof sourceLabels] || source;
   };
 
@@ -242,12 +280,9 @@ export default function LeadsList({
             onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
-        
+
         <div className="min-w-[120px]">
-          <Select
-            value={selectedStatus}
-            onChange={(e) => handleStatusChange(e.target.value)}
-          >
+          <Select value={selectedStatus} onChange={(e) => handleStatusChange(e.target.value)}>
             <option value="">جميع الحالات</option>
             <option value="new">جديد</option>
             <option value="contacted">تم التواصل</option>
@@ -257,10 +292,7 @@ export default function LeadsList({
         </div>
 
         <div className="min-w-[120px]">
-          <Select
-            value={selectedSource}
-            onChange={(e) => handleSourceChange(e.target.value)}
-          >
+          <Select value={selectedSource} onChange={(e) => handleSourceChange(e.target.value)}>
             <option value="">جميع المصادر</option>
             <option value="website">الموقع الإلكتروني</option>
             <option value="referral">إحالة</option>
@@ -283,42 +315,39 @@ export default function LeadsList({
             render: (lead: LeadWithOwner) => (
               <div>
                 <div className="font-medium">
-                  {lead.first_name && lead.last_name 
+                  {lead.first_name && lead.last_name
                     ? `${lead.first_name} ${lead.last_name}`
-                    : lead.first_name || lead.company || '-'
-                  }
+                    : lead.first_name || lead.company || '-'}
                 </div>
-                {lead.email && (
-                  <div className="text-sm text-gray-500">{lead.email}</div>
-                )}
+                {lead.email && <div className="text-sm text-gray-500">{lead.email}</div>}
               </div>
-            )
+            ),
           },
           {
             key: 'company',
             header: 'الشركة',
-            render: (lead: LeadWithOwner) => lead.company || '-'
+            render: (lead: LeadWithOwner) => lead.company || '-',
           },
           {
             key: 'source',
             header: 'المصدر',
-            render: (lead: LeadWithOwner) => getSourceLabel(lead.source || 'other')
+            render: (lead: LeadWithOwner) => getSourceLabel(lead.source || 'other'),
           },
           {
             key: 'status',
             header: 'الحالة',
-            render: (lead: LeadWithOwner) => getStatusBadge(lead.status || 'new')
+            render: (lead: LeadWithOwner) => getStatusBadge(lead.status || 'new'),
           },
           {
             key: 'owner',
             header: 'المسؤول',
-            render: (lead: LeadWithOwner) => lead.owner?.full_name || '-'
+            render: (lead: LeadWithOwner) => lead.owner?.full_name || '-',
           },
           {
             key: 'created_at',
             header: 'تاريخ الإنشاء',
-            render: (lead: LeadWithOwner) => 
-              lead.created_at ? new Date(lead.created_at).toLocaleDateString('ar-SA') : '-'
+            render: (lead: LeadWithOwner) =>
+              lead.created_at ? new Date(lead.created_at).toLocaleDateString('ar-SA') : '-',
           },
           {
             key: 'id' as keyof LeadWithOwner,
@@ -366,8 +395,8 @@ export default function LeadsList({
                   </Button>
                 )}
               </div>
-            )
-          }
+            ),
+          },
         ]}
         loading={isLoading}
       />
@@ -375,11 +404,7 @@ export default function LeadsList({
       {/* Load More Button */}
       {hasMore && (
         <div className="flex justify-center mt-4">
-          <Button
-            variant="secondary"
-            onClick={loadMore}
-            disabled={isFetching}
-          >
+          <Button variant="secondary" onClick={loadMore} disabled={isFetching}>
             {isFetching ? 'جاري التحميل...' : 'عرض المزيد'}
           </Button>
         </div>
@@ -392,11 +417,7 @@ export default function LeadsList({
           onClose={handleFormClose}
           title={editingLead ? 'تعديل العميل المحتمل' : 'إضافة عميل محتمل جديد'}
         >
-          <LeadForm
-            lead={editingLead}
-            onSuccess={handleFormSuccess}
-            onCancel={handleFormClose}
-          />
+          <LeadForm lead={editingLead} onSuccess={handleFormSuccess} onCancel={handleFormClose} />
         </Modal>
       )}
 

@@ -3,15 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --brand: #0D2A4B;
-  --accent: #FF6B00;
-  --bg: #F2F2F2;
-  --surface: #FFFFFF;
-  --text: #1A1A1A;
+  --brand: #0d2a4b;
+  --accent: #ff6b00;
+  --bg: #f2f2f2;
+  --surface: #ffffff;
+  --text: #1a1a1a;
   --muted: #666666;
 }
 
-html[dir="rtl"] * { letter-spacing: 0; }
+html[dir='rtl'] * {
+  letter-spacing: 0;
+}
 
 /* تنسيقات مخصصة لعناصر Select */
 select {
@@ -24,7 +26,7 @@ select {
   padding-left: 2.5rem;
 }
 
-html[dir="rtl"] select {
+html[dir='rtl'] select {
   background-position: right 0.5rem center;
   padding-left: 0.75rem;
   padding-right: 2.5rem;

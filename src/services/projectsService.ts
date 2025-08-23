@@ -3,7 +3,10 @@ import type { Project } from '@/types/project';
 const TABLE = 'projects';
 
 export async function listProjects(): Promise<Project[]> {
-  const { data, error } = await supabase.from(TABLE).select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data as Project[];
 }

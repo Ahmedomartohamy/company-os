@@ -1,23 +1,26 @@
 # Company OS — React + Vite + TypeScript + Tailwind (v2)
 
 هذه النسخة تضيف:
+
 - **Navbar علوي** + **Sidebar** مع أيقونات من **lucide-react**.
 - زر **تسجيل الخروج** بمتغير `variant="sidebar"` لضمان التباين وعدم الاختفاء عند التحويم.
 - نفس الألوان: brand #0D2A4B، accent #FF6B00، bg #F2F2F2.
 - مكونات UI أساسية + Dashboard RTL.
 
 ## التشغيل
+
 ```bash
 npm i
 npm run dev
 ```
 
 ## المجلدات
+
 - `src/app/layout/AppShell.tsx` : يحتوي Navbar + Sidebar + Main
 - `src/components/ui/Button.tsx` : يدعم variant جديد `sidebar`
 
-
 ## Sidebar & Page Headers
+
 - Global '+ إضافة مشروع' removed from AppShell. Each page now controls its own header/actions via `PageHeader`.
 - AppShell renders only layout (Navbar + Sidebar). A default sidebar is provided if none is passed.
 
@@ -32,6 +35,7 @@ npm run dev
 - Env template for Supabase keys.
 
 ### Quick start
+
 1. Copy `.env.example` to `.env` and set Supabase URL & anon key.
 2. Install deps: `npm i`
 3. Run dev server: `npm run dev`.
@@ -55,6 +59,7 @@ npm run dev
 ### النشر على Vercel:
 
 #### الطريقة الأولى: من خلال Vercel Dashboard
+
 1. اذهب إلى [vercel.com](https://vercel.com) وسجل دخول
 2. اضغط "New Project"
 3. اختر repository من GitHub
@@ -64,6 +69,7 @@ npm run dev
 5. اضغط "Deploy"
 
 #### الطريقة الثانية: من خلال Vercel CLI
+
 ```bash
 npm i -g vercel
 vercel login
@@ -71,6 +77,7 @@ vercel --prod
 ```
 
 ### إعداد قاعدة البيانات:
+
 قبل النشر، تأكد من تشغيل الأوامر التالية في Supabase:
 
 ```sql
@@ -88,6 +95,7 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium'
 ```
 
 ### إضافة بيانات تجريبية (Seeding):
+
 لإضافة بيانات تجريبية للتطوير والاختبار:
 
 1. افتح Supabase Dashboard
@@ -96,11 +104,13 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium'
 4. الصق المحتوى واضغط "Run"
 
 سيتم إضافة:
+
 - ~10 عملاء تجريبيين
 - ~5 مشاريع مرتبطة بالعملاء
 - ~20 مهمة مرتبطة بالمشاريع
 
 ### إنشاء حسابات تجريبية بصلاحيات مختلفة:
+
 لاختبار نظام الصلاحيات (RBAC)، يمكنك إنشاء حسابات تجريبية:
 
 1. تأكد من تشغيل `supabase/contacts-migration.sql` أولاً
@@ -109,6 +119,7 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium'
 4. الصق المحتوى واضغط "Run"
 
 سيتم إنشاء 4 حسابات:
+
 - **مدير النظام**: `admin@test.company-os.com` / `Admin123!`
 - **مدير المبيعات**: `sales.manager@test.company-os.com` / `Sales123!`
 - **مندوب مبيعات**: `sales.rep@test.company-os.com` / `Rep123!`
@@ -117,6 +128,7 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority VARCHAR(50) DEFAULT 'medium'
 لمزيد من التفاصيل، راجع ملف `TEST-USERS.md`
 
 ### ملفات مهمة تم إنشاؤها:
+
 - `.gitignore`: لحماية الملفات الحساسة
 - `vercel.json`: تكوين النشر على Vercel
 - `update-projects-schema.sql`: تحديثات قاعدة بيانات المشاريع

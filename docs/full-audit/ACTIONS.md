@@ -7,4 +7,5 @@
 ## P2 - Nice-to-Have
 
 ---
-*Format: [Priority] Task Description - Owner: [TBD] - Estimate: [S/M/L]*
+
+_Format: [Priority] Task Description - Owner: [TBD] - Estimate: [S/M/L]_

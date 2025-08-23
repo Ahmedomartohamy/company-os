@@ -1,6 +1,6 @@
 # Executive Summary - Full Application Audit
 
-*This file will be populated with the comprehensive audit findings*
+_This file will be populated with the comprehensive audit findings_
 
 ## Current Status
 

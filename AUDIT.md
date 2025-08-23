@@ -13,6 +13,7 @@ This is a React + Vite + TypeScript + Tailwind CSS project with RTL (Arabic) sup
 ## Project Snapshot
 
 ### Configuration & Dependencies
+
 - **Framework**: React 18.3.1 + Vite 5.4.6 + TypeScript 5.5.4
 - **Styling**: Tailwind CSS 3.4.10 with RTL support
 - **Backend**: Supabase (Auth + Database)
@@ -23,6 +24,7 @@ This is a React + Vite + TypeScript + Tailwind CSS project with RTL (Arabic) sup
 - **Charts**: recharts 2.12.7
 
 ### Project Structure
+
 ```
 src/
 ├── app/                    # Application core
@@ -41,6 +43,7 @@ src/
 ```
 
 ### UI Kit & RTL Support
+
 - **Custom UI Kit**: Hand-built components (Button, Input, Modal, etc.)
 - **RTL Support**: ✅ Implemented with Arabic text and RTL-specific CSS
 - **Icons**: Lucide React icons throughout
@@ -51,9 +54,11 @@ src/
 ## Routing & Pages
 
 ### Router Configuration
+
 **Entry Point**: `src/main.tsx` → `App.tsx` → `Router.tsx`
 
 ### Route Structure
+
 ```
 /login                    → Login.tsx (public)
 /                        → Dashboard.tsx (protected)
@@ -64,11 +69,13 @@ src/
 ```
 
 ### Route Protection
+
 - **Guard**: `ProtectedRoute.tsx` using `useAuth()` hook
 - **Layout**: `AppShell.tsx` wraps all protected routes
 - **Redirect**: Unauthenticated users → `/login`
 
 ### Import Status
+
 ✅ All imports resolved correctly  
 ✅ Path aliases (`@/*`) working properly  
 ✅ No broken imports detected
@@ -78,22 +85,25 @@ src/
 ## Auth & RBAC
 
 ### Authentication Implementation
+
 - **Provider**: `AuthProvider.tsx` with React Context
 - **Supabase Auth**: Email/password authentication
 - **Session Management**: Persistent sessions with auto-refresh
 - **Auth State**: `getSession()` + `onAuthStateChange()` listeners
 
 ### RBAC System
+
 **Status**: ✅ DEFINED but ❌ NOT IMPLEMENTED
 
 **Roles**: `admin`, `sales`, `pm`, `viewer`  
 **Permissions**: 9 permission types defined
+
 ```typescript
-- clients.read/write
-- projects.read/write  
-- tasks.read/write
-- deals.read/write
-- settings.write
+-clients.read / write -
+  projects.read / write -
+  tasks.read / write -
+  deals.read / write -
+  settings.write;
 ```
 
 **Gap**: RBAC permissions defined in `lib/rbac.ts` but not enforced in UI or API calls
@@ -103,9 +113,11 @@ src/
 ## Supabase Integration
 
 ### Database Schema
+
 **Tables Implemented**: 3/15 CRM tables
 
 #### Core Tables
+
 1. **clients** (✅ COMPLETE)
    - Fields: id, name, email, phone, company, timestamps
    - Indexes: email
@@ -122,18 +134,23 @@ src/
    - RLS: Enabled with authenticated user policy
 
 ### API Operations
+
 **Pattern**: Standard CRUD operations via Supabase client
+
 - `listX()`, `getX(id)`, `createX()`, `updateX()`, `deleteX()`
 - All services follow consistent patterns
 - Error handling implemented
 
 ### Schema Migrations
+
 **Files Present**:
+
 - `database-setup.sql` - Initial schema
 - `update-projects-schema.sql` - Projects table fixes
 - `update-tasks-schema.sql` - Tasks table fixes
 
 ### Storage Integration
+
 ❌ **NOT IMPLEMENTED** - No storage buckets or file upload functionality
 
 ---
@@ -141,13 +158,17 @@ src/
 ## Build Health
 
 ### TypeScript Compilation
+
 ✅ **PASSING** - No TypeScript errors
+
 - All types properly defined with Zod schemas
 - Path aliases resolved correctly
 - Import/export statements valid
 
 ### Vite Build
+
 ✅ **PASSING** - Production build successful
+
 ```
 dist/index.html                   0.42 kB
 dist/assets/index-n6fTeqMX.css   20.20 kB
@@ -155,58 +176,65 @@ dist/assets/index-CkGmnmEQ.js   470.89 kB
 ```
 
 ### ESLint Status
+
 ❌ **FAILING** - Configuration migration needed
+
 - Issue: ESLint v9 requires `eslint.config.js` instead of `.eslintrc.cjs`
 - Current: Using deprecated `.eslintrc.cjs` format
 - Impact: Linting not running, potential code quality issues
 
 ### Dependencies
+
 ✅ All dependencies up-to-date and compatible
 
 ---
 
 ## Feature Matrix vs CRM Scope
 
-| Feature | Status | Implementation |
-|---------|--------|----------------|
-| **Accounts/Clients** | ✅ DONE | Full CRUD, form validation, data table |
-| **Contacts** | ❌ MISSING | No table, no API, no UI |
-| **Leads** | ❌ MISSING | No lead management system |
-| **Opportunities** | ❌ MISSING | No sales pipeline |
-| **Pipelines & Stages** | ❌ MISSING | No Kanban, no stage management |
-| **Activities** | ❌ MISSING | No activity tracking |
-| **Tasks** | ✅ DONE | Full CRUD, assignee, priority, due dates |
-| **Projects** | ✅ DONE | Full CRUD, client linking, budget tracking |
-| **Storage** | ❌ MISSING | No file attachments |
-| **Auth + Profiles** | 🟡 PARTIAL | Auth works, no user profiles |
-| **RBAC** | 🟡 PARTIAL | Defined but not enforced |
-| **Reporting** | ❌ MISSING | No KPIs, no charts (recharts unused) |
-| **Audit Log** | ❌ MISSING | No activity logging |
-| **Timesheets** | ❌ MISSING | No time tracking |
-| **Vendors/PO** | ❌ MISSING | No vendor management |
-| **Quotes/Invoices** | ❌ MISSING | No financial documents |
+| Feature                | Status     | Implementation                             |
+| ---------------------- | ---------- | ------------------------------------------ |
+| **Accounts/Clients**   | ✅ DONE    | Full CRUD, form validation, data table     |
+| **Contacts**           | ❌ MISSING | No table, no API, no UI                    |
+| **Leads**              | ❌ MISSING | No lead management system                  |
+| **Opportunities**      | ❌ MISSING | No sales pipeline                          |
+| **Pipelines & Stages** | ❌ MISSING | No Kanban, no stage management             |
+| **Activities**         | ❌ MISSING | No activity tracking                       |
+| **Tasks**              | ✅ DONE    | Full CRUD, assignee, priority, due dates   |
+| **Projects**           | ✅ DONE    | Full CRUD, client linking, budget tracking |
+| **Storage**            | ❌ MISSING | No file attachments                        |
+| **Auth + Profiles**    | 🟡 PARTIAL | Auth works, no user profiles               |
+| **RBAC**               | 🟡 PARTIAL | Defined but not enforced                   |
+| **Reporting**          | ❌ MISSING | No KPIs, no charts (recharts unused)       |
+| **Audit Log**          | ❌ MISSING | No activity logging                        |
+| **Timesheets**         | ❌ MISSING | No time tracking                           |
+| **Vendors/PO**         | ❌ MISSING | No vendor management                       |
+| **Quotes/Invoices**    | ❌ MISSING | No financial documents                     |
 
 ---
 
 ## Key Gaps (Blocking Items)
 
 ### Database Schema Gaps
+
 1. **Missing Tables**: contacts, leads, opportunities, activities, pipelines, stages, user_profiles
 2. **Missing Relationships**: No foreign keys for lead→opportunity conversion
 3. **Missing Indexes**: No performance indexes for reporting queries
 
 ### API Layer Gaps
+
 1. **No RPC Functions**: No complex business logic in database
 2. **No Aggregation Queries**: Dashboard KPIs are hardcoded
 3. **No Bulk Operations**: No batch updates or deletes
 
 ### UI/UX Gaps
+
 1. **No Kanban Component**: Pipeline management missing
 2. **No File Upload**: Storage integration missing
 3. **No Charts**: Recharts library unused
 4. **No Search/Filter**: Basic search only in DataTable
 
 ### Security Gaps
+
 1. **RLS Policies**: Too permissive (all authenticated users)
 2. **RBAC Enforcement**: Permissions not checked in UI
 3. **Input Validation**: Only client-side Zod validation
@@ -216,15 +244,18 @@ dist/assets/index-CkGmnmEQ.js   470.89 kB
 ## Common Issues Detected
 
 ### Configuration Issues
+
 1. **ESLint v9 Migration**: `.eslintrc.cjs` → `eslint.config.js` needed
 2. **Missing TypeCheck Script**: No `npm run typecheck` command
 
 ### Code Quality
+
 ✅ No TODO/FIXME comments found  
 ✅ No duplicate imports detected  
 ✅ No obvious anti-patterns
 
 ### Potential Runtime Issues
+
 1. **Hardcoded Dashboard Data**: KPI values are static
 2. **Missing Error Boundaries**: Limited error handling in components
 3. **No Loading States**: Some operations lack loading indicators
@@ -259,21 +290,25 @@ dist/assets/index-CkGmnmEQ.js   470.89 kB
 ## Recommendations
 
 ### Immediate Actions
+
 1. Fix ESLint configuration for code quality
 2. Implement real dashboard data
 3. Add user profiles and role assignment
 
 ### Short Term (1-2 weeks)
+
 1. Complete CRM core: Contacts, Leads, Opportunities
 2. Implement proper RBAC enforcement
 3. Add file storage capabilities
 
 ### Medium Term (1 month)
+
 1. Build reporting dashboard with charts
 2. Implement activity timeline
 3. Add advanced search and filtering
 
 ### Architecture Considerations
+
 1. Consider state management upgrade (Zustand/Redux) for complex state
 2. Implement proper error boundaries and logging
 3. Add comprehensive testing suite

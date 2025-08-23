@@ -20,11 +20,13 @@ Four KPI views have been created to provide key performance indicators for the d
 **Description**: Sums the `amount` field from all opportunities with status 'open'. Uses `COALESCE` to return 0 if no open opportunities exist.
 
 **Test Query**:
+
 ```sql
 SELECT * FROM public.v_kpi_pipeline_value;
 ```
 
 **Expected Output**:
+
 ```
 pipeline_value
 --------------
@@ -38,11 +40,13 @@ pipeline_value
 **Description**: Multiplies each opportunity's `amount` by its `probability` (converted to decimal). Ensures probability is between 0-100% using `GREATEST` and `LEAST` functions.
 
 **Test Query**:
+
 ```sql
 SELECT * FROM public.v_kpi_expected_revenue;
 ```
 
 **Expected Output**:
+
 ```
 expected_revenue
 ----------------
@@ -56,11 +60,13 @@ expected_revenue
 **Description**: Groups leads by `source` field and counts occurrences for leads created in the last 30 days. Results are ordered by count (descending).
 
 **Test Query**:
+
 ```sql
 SELECT * FROM public.v_kpi_leads_by_source_30d;
 ```
 
 **Expected Output**:
+
 ```
    source    | cnt
 -------------+-----
@@ -77,11 +83,13 @@ SELECT * FROM public.v_kpi_leads_by_source_30d;
 **Description**: Uses conditional aggregation with `CASE` statements to count tasks due on `current_date` and `current_date + 1`.
 
 **Test Query**:
+
 ```sql
 SELECT * FROM public.v_kpi_tasks_due;
 ```
 
 **Expected Output**:
+
 ```
 due_today | due_tomorrow
 ----------+-------------
@@ -105,6 +113,7 @@ due_today | due_tomorrow
 ## Dependencies
 
 These views depend on the following tables:
+
 - `public.opportunities` (status, amount, probability fields)
 - `public.leads` (source, created_at fields)
 - `public.tasks` (due_date field)

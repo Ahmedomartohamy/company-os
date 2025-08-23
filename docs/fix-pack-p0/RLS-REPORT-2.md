@@ -11,12 +11,14 @@ This migration enables Row Level Security (RLS) and implements comprehensive sec
 ## Tables Processed
 
 ### 1. Projects Table
+
 - **RLS Status:** ✅ Enabled
 - **Owner ID Detection:** Dynamic (checked at runtime)
 - **Policies Created:** 4 policies
 - **Audit Logging:** ✅ Enabled
 
 #### Policies:
+
 - **SELECT:** `projects_read_all` - All authenticated users can read
 - **INSERT:** `projects_insert_roles` - admin, sales_manager, sales_rep can create
 - **UPDATE:** Dynamic policy based on owner_id presence:
@@ -25,12 +27,14 @@ This migration enables Row Level Security (RLS) and implements comprehensive sec
 - **DELETE:** `projects_delete_admin_only` - admin only
 
 ### 2. Tasks Table
+
 - **RLS Status:** ✅ Enabled
 - **Owner ID Detection:** Dynamic (checked at runtime)
 - **Policies Created:** 4 policies
 - **Audit Logging:** ✅ Enabled
 
 #### Policies:
+
 - **SELECT:** `tasks_read_all` - All authenticated users can read
 - **INSERT:** `tasks_insert_roles` - admin, sales_manager, sales_rep can create
 - **UPDATE:** Dynamic policy based on owner_id presence:
@@ -41,15 +45,18 @@ This migration enables Row Level Security (RLS) and implements comprehensive sec
 ## Security Model
 
 ### Access Control Matrix
+
 | Operation | Admin | Sales Manager | Sales Rep | Owner (if owner_id exists) |
-|-----------|-------|---------------|-----------|----------------------------|
-| SELECT    | ✅     | ✅             | ✅         | ✅                          |
-| INSERT    | ✅     | ✅             | ✅         | N/A                        |
-| UPDATE    | ✅     | ✅             | ❌         | ✅                          |
-| DELETE    | ✅     | ❌             | ❌         | ❌                          |
+| --------- | ----- | ------------- | --------- | -------------------------- |
+| SELECT    | ✅    | ✅            | ✅        | ✅                         |
+| INSERT    | ✅    | ✅            | ✅        | N/A                        |
+| UPDATE    | ✅    | ✅            | ❌        | ✅                         |
+| DELETE    | ✅    | ❌            | ❌        | ❌                         |
 
 ### Dynamic Owner Detection
+
 The migration uses the `public._has_owner_id()` function to:
+
 1. Check if `owner_id` column exists on each table
 2. Apply appropriate UPDATE policies:
    - **With owner_id:** Owner can update their own records + managers can update any
@@ -58,10 +65,12 @@ The migration uses the `public._has_owner_id()` function to:
 ## Audit System
 
 ### Triggers Installed
+
 - `trg_projects_audit` - Tracks all changes to projects table
 - `trg_tasks_audit` - Tracks all changes to tasks table
 
 ### Audit Data Captured
+
 - **INSERT:** Full new record
 - **UPDATE:** Only changed fields (diff)
 - **DELETE:** Full deleted record
@@ -70,12 +79,14 @@ The migration uses the `public._has_owner_id()` function to:
 ## Technical Implementation
 
 ### Migration Features
+
 - **Idempotent Design:** Safe to run multiple times
 - **Error Handling:** Uses `if exists` checks and proper transaction boundaries
 - **Dynamic Policies:** Adapts to schema changes automatically
 - **Clean Syntax:** Uses drop/create pattern to avoid PostgreSQL syntax limitations
 
 ### Dependencies
+
 - Requires `public._has_owner_id()` function (from RLS-1 migration)
 - Requires `public._audit_generic()` function (from RLS-1 migration)
 - Requires `public.profiles` table with role column

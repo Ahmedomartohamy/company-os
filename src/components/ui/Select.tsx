@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef } from 'react';
 
 interface SelectOption {
   value: string;
@@ -14,7 +14,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { options, placeholder, label, error, className, children, ...props },
-  ref
+  ref,
 ) {
   return (
     <div className="block">
@@ -23,8 +23,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
         ref={ref}
         {...props}
         className={
-          "block w-full rounded-xl border-gray-200 bg-white text-sm shadow-sm focus:border-brand focus:ring-brand " +
-          (className ?? "")
+          'block w-full rounded-xl border-gray-200 bg-white text-sm shadow-sm focus:border-brand focus:ring-brand ' +
+          (className ?? '')
         }
       >
         {placeholder && (

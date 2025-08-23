@@ -11,19 +11,16 @@ import {
   useSensors,
   closestCorners,
 } from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { 
-  getPipeline, 
-  moveOpportunityStage, 
+import {
+  getPipeline,
+  moveOpportunityStage,
   OpportunityWithDetails,
   Stage,
-  Pipeline 
+  Pipeline,
 } from '@/lib/opportunities';
 import { useAuthz } from '@/lib/useAuthz';
 import Modal from '@/components/ui/Modal';
@@ -41,15 +38,15 @@ interface StageColumnProps {
   movingOpportunities: Set<string>;
 }
 
-function StageColumn({ 
-  stage, 
-  opportunities, 
-  onEditOpportunity, 
+function StageColumn({
+  stage,
+  opportunities,
+  onEditOpportunity,
   onDeleteOpportunity,
   onLoadMore,
   hasMore,
   isLoading,
-  movingOpportunities
+  movingOpportunities,
 }: StageColumnProps) {
   const { can } = useAuthz();
   const canCreate = can('create', 'opportunities');
@@ -64,7 +61,7 @@ function StageColumn({
             {opportunities.length} فرصة • {stage.probability}% احتمالية
           </p>
         </div>
-        
+
         {canCreate && (
           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-md transition-colors">
             <Plus className="h-4 w-4" />
@@ -73,15 +70,15 @@ function StageColumn({
       </div>
 
       {/* Opportunities List */}
-      <SortableContext 
-        items={opportunities.map(opp => opp.id!)} 
+      <SortableContext
+        items={opportunities.map((opp) => opp.id!)}
         strategy={verticalListSortingStrategy}
       >
         <div className="space-y-3">
           {opportunities.map((opportunity) => {
             const isMoving = movingOpportunities.has(opportunity.id!);
             const canMove = can('update', 'opportunities', opportunity);
-            
+
             return (
               <OpportunityCard
                 key={opportunity.id}
@@ -135,13 +132,17 @@ export function OpportunitiesBoard() {
   const { pipelineId } = useParams<{ pipelineId: string }>();
   const queryClient = useQueryClient();
   const { can } = useAuthz();
-  
+
   const [activeOpportunity, setActiveOpportunity] = useState<OpportunityWithDetails | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [movingOpportunities, setMovingOpportunities] = useState<Set<string>>(new Set());
-  const [optimisticMoves, setOptimisticMoves] = useState<Map<string, { fromStageId: string; toStageId: string }>>(new Map());
+  const [optimisticMoves, setOptimisticMoves] = useState<
+    Map<string, { fromStageId: string; toStageId: string }>
+  >(new Map());
   const [page, setPage] = useState(1);
-  const [allOpportunities, setAllOpportunities] = useState<Map<string, OpportunityWithDetails[]>>(new Map());
+  const [allOpportunities, setAllOpportunities] = useState<Map<string, OpportunityWithDetails[]>>(
+    new Map(),
+  );
 
   // Sensors for drag and drop
   const sensors = useSensors(
@@ -149,31 +150,33 @@ export function OpportunitiesBoard() {
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
   // Fetch pipeline data
-  const { 
-    data: pipeline, 
-    isLoading, 
-    error 
+  const {
+    data: pipeline,
+    isLoading,
+    error,
   } = useQuery<Pipeline | null>({
     queryKey: ['pipeline', pipelineId, page],
     queryFn: () => getPipeline(pipelineId!, page, 25),
-    enabled: !!pipelineId
+    enabled: !!pipelineId,
   });
 
   // Handle data updates when pipeline data changes
   React.useEffect(() => {
     if (pipeline?.stages) {
-      setAllOpportunities(prev => {
+      setAllOpportunities((prev) => {
         const newMap = new Map(prev);
-        (pipeline as unknown as Pipeline).stages.forEach((stage: Stage & { opportunities?: OpportunityWithDetails[] }) => {
-          const stageId = stage.id;
-          const existingOpps = page === 1 ? [] : (newMap.get(stageId) || []);
-          const newOpps = stage.opportunities || [];
-          newMap.set(stageId, [...existingOpps, ...newOpps]);
-        });
+        (pipeline as unknown as Pipeline).stages.forEach(
+          (stage: Stage & { opportunities?: OpportunityWithDetails[] }) => {
+            const stageId = stage.id;
+            const existingOpps = page === 1 ? [] : newMap.get(stageId) || [];
+            const newOpps = stage.opportunities || [];
+            newMap.set(stageId, [...existingOpps, ...newOpps]);
+          },
+        );
         return newMap;
       });
     }
@@ -181,16 +184,16 @@ export function OpportunitiesBoard() {
 
   // Mutation for moving opportunities with optimistic updates
   const moveOpportunityMutation = useMutation({
-    mutationFn: ({ oppId, stageId }: { oppId: string; stageId: string }) => 
+    mutationFn: ({ oppId, stageId }: { oppId: string; stageId: string }) =>
       moveOpportunityStage(oppId, stageId),
     onSuccess: (_, { oppId }) => {
       // Clear moving state and optimistic move
-      setMovingOpportunities(prev => {
+      setMovingOpportunities((prev) => {
         const newSet = new Set(prev);
         newSet.delete(oppId);
         return newSet;
       });
-      setOptimisticMoves(prev => {
+      setOptimisticMoves((prev) => {
         const newMap = new Map(prev);
         newMap.delete(oppId);
         return newMap;
@@ -201,33 +204,33 @@ export function OpportunitiesBoard() {
     onError: (error, { oppId }) => {
       console.error('Error moving opportunity:', error);
       // Rollback optimistic move
-      setOptimisticMoves(prev => {
+      setOptimisticMoves((prev) => {
         const newMap = new Map(prev);
         newMap.delete(oppId);
         return newMap;
       });
-      setMovingOpportunities(prev => {
+      setMovingOpportunities((prev) => {
         const newSet = new Set(prev);
         newSet.delete(oppId);
         return newSet;
       });
       toast.error('فشل نقل الصفقة؛ تم التراجع');
-    }
+    },
   });
 
   // Group opportunities by stage with optimistic moves
   const stagesWithOpportunities = useMemo(() => {
     if (!(pipeline as unknown as Pipeline)?.stages) return [];
-    
+
     return (pipeline as unknown as Pipeline).stages.map((stage: Stage) => {
       const stageOpportunities = allOpportunities.get(stage.id) || [];
-      
+
       // Apply optimistic moves
-      const adjustedOpportunities = stageOpportunities.filter(opp => {
+      const adjustedOpportunities = stageOpportunities.filter((opp) => {
         const optimisticMove = optimisticMoves.get(opp.id!);
         return !optimisticMove || optimisticMove.toStageId === stage.id;
       });
-      
+
       // Add opportunities moved to this stage
       const movedToThisStage = (pipeline as unknown as Pipeline).stages
         .filter((s: Stage) => s.id !== stage.id)
@@ -236,10 +239,10 @@ export function OpportunitiesBoard() {
           const optimisticMove = optimisticMoves.get(opp.id!);
           return optimisticMove && optimisticMove.toStageId === stage.id;
         });
-      
+
       return {
         ...stage,
-        opportunities: [...adjustedOpportunities, ...movedToThisStage]
+        opportunities: [...adjustedOpportunities, ...movedToThisStage],
       };
     });
   }, [pipeline, allOpportunities, optimisticMoves]);
@@ -252,24 +255,25 @@ export function OpportunitiesBoard() {
 
   // Load more opportunities
   const loadMore = () => {
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
   };
 
   // Check if there are more opportunities to load
-  const hasMore = (pipeline as unknown as Pipeline)?.stages.some((stage: Stage) => {
-    const currentOpps = allOpportunities.get(stage.id) || [];
-    const latestOpps = stage.opportunities || [];
-    return latestOpps.length === 25; // If we got exactly 25, there might be more
-  }) || false;
+  const hasMore =
+    (pipeline as unknown as Pipeline)?.stages.some((stage: Stage) => {
+      const currentOpps = allOpportunities.get(stage.id) || [];
+      const latestOpps = stage.opportunities || [];
+      return latestOpps.length === 25; // If we got exactly 25, there might be more
+    }) || false;
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    
+
     // Find the opportunity being dragged
     const opportunity = stagesWithOpportunities
       .flatMap((stage: Stage & { opportunities: OpportunityWithDetails[] }) => stage.opportunities)
       .find((opp: OpportunityWithDetails) => opp.id === active.id);
-    
+
     if (opportunity) {
       setActiveOpportunity(opportunity);
     }
@@ -278,46 +282,46 @@ export function OpportunitiesBoard() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveOpportunity(null);
-    
+
     if (!over || active.id === over.id) return;
-    
+
     const opportunityId = active.id as string;
     const newStageId = over.id as string;
-    
+
     // Find the opportunity being moved
     const opportunity = stagesWithOpportunities
       .flatMap((stage: Stage & { opportunities: OpportunityWithDetails[] }) => stage.opportunities)
       .find((opp: OpportunityWithDetails) => opp.id === opportunityId);
-    
+
     if (!opportunity) return;
-    
+
     // Check if user can move this opportunity (enhanced RBAC)
     if (!can('update', 'opportunities', opportunity)) {
       toast.error('غير مسموح لك بنقل هذه الفرصة');
       return;
     }
-    
+
     const currentStageId = opportunity.stage_id;
     if (currentStageId === newStageId) return;
-    
+
     // Apply optimistic update
-    setOptimisticMoves(prev => {
+    setOptimisticMoves((prev) => {
       const newMap = new Map(prev);
       newMap.set(opportunityId, { fromStageId: currentStageId, toStageId: newStageId });
       return newMap;
     });
-    
+
     // Set moving state
-    setMovingOpportunities(prev => {
+    setMovingOpportunities((prev) => {
       const newSet = new Set(prev);
       newSet.add(opportunityId);
       return newSet;
     });
-    
+
     // Execute the move
     moveOpportunityMutation.mutate({
       oppId: opportunityId,
-      stageId: newStageId
+      stageId: newStageId,
     });
   };
 
@@ -374,14 +378,21 @@ export function OpportunitiesBoard() {
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{(pipeline as unknown as Pipeline)?.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {(pipeline as unknown as Pipeline)?.name}
+            </h1>
             <p className="text-gray-600 mt-1">
-              {stagesWithOpportunities.reduce((total: number, stage: Stage & { opportunities: OpportunityWithDetails[] }) => total + stage.opportunities.length, 0)} فرصة تجارية
+              {stagesWithOpportunities.reduce(
+                (total: number, stage: Stage & { opportunities: OpportunityWithDetails[] }) =>
+                  total + stage.opportunities.length,
+                0,
+              )}{' '}
+              فرصة تجارية
             </p>
           </div>
-          
+
           {can('create', 'opportunities') && (
-            <button 
+            <button
               onClick={() => setShowCreateForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
             >
@@ -401,29 +412,26 @@ export function OpportunitiesBoard() {
           onDragEnd={handleDragEnd}
         >
           <div className="flex gap-6 min-w-max">
-            {stagesWithOpportunities.map((stage: Stage & { opportunities: OpportunityWithDetails[] }) => (
-              <StageColumn
-                key={stage.id}
-                stage={stage}
-                opportunities={stage.opportunities}
-                onEditOpportunity={handleEditOpportunity}
-                onDeleteOpportunity={handleDeleteOpportunity}
-                onLoadMore={loadMore}
-                hasMore={hasMore}
-                isLoading={isLoading}
-                movingOpportunities={movingOpportunities}
-              />
-            ))}
+            {stagesWithOpportunities.map(
+              (stage: Stage & { opportunities: OpportunityWithDetails[] }) => (
+                <StageColumn
+                  key={stage.id}
+                  stage={stage}
+                  opportunities={stage.opportunities}
+                  onEditOpportunity={handleEditOpportunity}
+                  onDeleteOpportunity={handleDeleteOpportunity}
+                  onLoadMore={loadMore}
+                  hasMore={hasMore}
+                  isLoading={isLoading}
+                  movingOpportunities={movingOpportunities}
+                />
+              ),
+            )}
           </div>
 
           {/* Drag Overlay */}
           <DragOverlay>
-            {activeOpportunity && (
-              <OpportunityCard
-                opportunity={activeOpportunity}
-                isDragging
-              />
-            )}
+            {activeOpportunity && <OpportunityCard opportunity={activeOpportunity} isDragging />}
           </DragOverlay>
         </DndContext>
       </div>

@@ -5,7 +5,12 @@ interface EmptyStateProps {
   action?: React.ReactNode;
 }
 
-export default function EmptyState({ title = "لا توجد بيانات", hint = "ابدأ بإضافة سجل جديد.", description, action }: EmptyStateProps) {
+export default function EmptyState({
+  title = 'لا توجد بيانات',
+  hint = 'ابدأ بإضافة سجل جديد.',
+  description,
+  action,
+}: EmptyStateProps) {
   return (
     <div className="text-center py-16">
       <div className="text-xl font-semibold mb-2">{title}</div>

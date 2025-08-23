@@ -37,12 +37,12 @@ const PERMISSIONS: Record<string, Role[]> = {
   'opportunities.view': ['admin', 'sales_manager', 'sales_rep', 'viewer'],
   'opportunities.create': ['admin', 'sales_manager', 'sales_rep'],
   'opportunities.update': ['admin', 'sales_manager', 'sales_rep'],
-  'opportunities.delete': ['admin']
+  'opportunities.delete': ['admin'],
 };
 
 export function useAuthz(): AuthzResult {
   const { user } = useAuth();
-  
+
   // Fetch user profile with role
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -59,25 +59,25 @@ export function useAuthz(): AuthzResult {
       }
       return data;
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
   });
 
-  const role = profile?.role as Role || null;
+  const role = (profile?.role as Role) || null;
 
   const can = (action: Action, resource: Resource, record?: AuthzRecord): boolean => {
     if (!role) return false;
-    
+
     const permission = `${resource}.${action}`;
     const allowedRoles = PERMISSIONS[permission] || [];
-    
+
     // Check basic role permission
     if (!allowedRoles.includes(role)) return false;
-    
+
     // Special case: sales_rep can only update/delete their own records
     if (role === 'sales_rep' && (action === 'update' || action === 'delete') && record) {
       return record.owner_id === user?.id;
     }
-    
+
     return true;
   };
 

@@ -1,11 +1,13 @@
 # Frontend Details Implementation Report
 
 ## Overview
+
 Implemented `/opportunities/:id` details page and create/update form modal functionality for the opportunities management system.
 
 ## Files Created/Modified
 
 ### New Files Created
+
 1. **src/modules/opportunities/OpportunityDetails.tsx**
    - Full opportunity details page with all required fields
    - RBAC integration for update/delete actions
@@ -25,6 +27,7 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
    - This documentation file
 
 ### Modified Files
+
 1. **src/app/Router.tsx**
    - Added `/opportunities/:id` route registration
    - Imported OpportunityDetails component
@@ -46,6 +49,7 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 ## Features Implemented
 
 ### Details Page Features
+
 - **Display Fields**: name, client, contact, amount, currency, stage, probability, owner, status, close_date
 - **Actions**: Edit and Delete buttons (RBAC protected)
 - **Navigation**: Back to pipeline board
@@ -53,7 +57,8 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 - **Loading States**: Skeleton loading and error handling
 
 ### Form Features
-- **Validation**: 
+
+- **Validation**:
   - Name field required
   - Amount must be ≥ 0
   - Probability range 0-100
@@ -64,12 +69,14 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 - **User Feedback**: Toast notifications for success/error
 
 ### Navigation Flow
+
 - **Card Click**: Navigate to `/opportunities/:id` (if user has view permission)
 - **Toolbar Button**: "إضافة فرصة" opens create form modal
 - **Form Success**: Closes modal and refreshes data
 - **Form Cancel**: Closes modal without changes
 
 ## RBAC Implementation
+
 - **View**: Required to navigate to details page
 - **Create**: Required to see and use create button
 - **Update**: Required to see edit button and form
@@ -79,6 +86,7 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 ## Technical Details
 
 ### Dependencies Used
+
 - React Router for navigation
 - React Query for data fetching
 - Zod for form validation
@@ -87,18 +95,21 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 - Existing UI components (Modal, Button, etc.)
 
 ### Data Flow
+
 - Details page fetches single opportunity by ID
 - Form uses existing createOpportunity/updateOpportunity functions
 - Client data fetched from clientsService
 - Stage data passed from pipeline context
 
 ### Error Handling
+
 - Network errors displayed with user-friendly messages
 - Form validation errors shown inline
 - Loading states prevent user confusion
 - Graceful fallbacks for missing data
 
 ## Testing Considerations
+
 - All RBAC scenarios should be tested
 - Form validation edge cases
 - Navigation flows between components
@@ -106,6 +117,7 @@ Implemented `/opportunities/:id` details page and create/update form modal funct
 - Data refresh after mutations
 
 ## Status
+
 ✅ **COMPLETED** - All requirements implemented and integrated successfully.
 
 The implementation follows the existing codebase patterns and maintains consistency with the current architecture. All RBAC requirements are respected, and the user experience is smooth with proper loading states and error handling.

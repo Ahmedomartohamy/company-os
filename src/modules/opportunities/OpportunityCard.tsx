@@ -19,19 +19,19 @@ interface OpportunityCardProps {
   canMove?: boolean;
 }
 
-export function OpportunityCard({ 
-  opportunity, 
-  onEdit, 
-  onDelete, 
+export function OpportunityCard({
+  opportunity,
+  onEdit,
+  onDelete,
   isDragging = false,
   onClick,
   isMoving = false,
-  canMove = false
+  canMove = false,
 }: OpportunityCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { can } = useAuthz();
-  
+
   const {
     attributes,
     listeners,
@@ -39,9 +39,9 @@ export function OpportunityCard({
     transform,
     transition,
     isDragging: isSortableDragging,
-  } = useSortable({ 
+  } = useSortable({
     id: opportunity.id!,
-    disabled: !canMove || isMoving
+    disabled: !canMove || isMoving,
   });
 
   const style = {
@@ -109,10 +109,7 @@ export function OpportunityCard({
             <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
         ) : (
-          <div 
-            className="p-1 cursor-not-allowed" 
-            title="غير مسموح بنقل الصفقة"
-          >
+          <div className="p-1 cursor-not-allowed" title="غير مسموح بنقل الصفقة">
             <GripVertical className="h-4 w-4 text-gray-300" />
           </div>
         )}
@@ -122,13 +119,13 @@ export function OpportunityCard({
         <h3 className="font-semibold text-gray-900 text-sm leading-tight flex-1 ml-2">
           {opportunity.name}
         </h3>
-        
+
         {(canUpdate || canDelete) && (
           <div className="relative group">
             <button className="p-1 rounded-md hover:bg-gray-100 transition-colors">
               <MoreVertical className="h-4 w-4 text-gray-400" />
             </button>
-            
+
             {/* Dropdown Menu */}
             <div className="absolute left-0 top-8 w-32 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               {canUpdate && onEdit && (
@@ -189,27 +186,23 @@ export function OpportunityCard({
       {/* Footer */}
       <div className="flex items-center justify-between pt-2 border-t border-gray-100">
         {/* Probability Badge */}
-        <div className={`
+        <div
+          className={`
           px-2 py-1 rounded-full text-xs font-medium
           ${getProbabilityColor(opportunity.probability)}
-        `}>
+        `}
+        >
           {opportunity.probability}%
         </div>
 
         {/* Stage Info */}
-        {opportunity.stage && (
-          <div className="text-xs text-gray-500">
-            {opportunity.stage.name}
-          </div>
-        )}
+        {opportunity.stage && <div className="text-xs text-gray-500">{opportunity.stage.name}</div>}
       </div>
 
       {/* Notes Preview */}
       {opportunity.notes && (
         <div className="mt-2 pt-2 border-t border-gray-100">
-          <p className="text-xs text-gray-600 line-clamp-2">
-            {opportunity.notes}
-          </p>
+          <p className="text-xs text-gray-600 line-clamp-2">{opportunity.notes}</p>
         </div>
       )}
     </div>

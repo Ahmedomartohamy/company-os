@@ -24,7 +24,7 @@ export default function ConvertLeadDialog({
   lead,
   open,
   onClose,
-  onSuccess
+  onSuccess,
 }: ConvertLeadDialogProps) {
   const [selectedClientId, setSelectedClientId] = useState('');
   const [createNewClient, setCreateNewClient] = useState(false);
@@ -36,7 +36,7 @@ export default function ConvertLeadDialog({
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
     queryFn: listClients,
-    enabled: !createNewClient
+    enabled: !createNewClient,
   });
 
   // Convert lead mutation
@@ -53,7 +53,7 @@ export default function ConvertLeadDialog({
     onError: (error) => {
       console.error('Convert lead error:', error);
       toast.error('حدث خطأ أثناء تحويل العميل المحتمل');
-    }
+    },
   });
 
   const handleConvert = () => {
@@ -78,7 +78,7 @@ export default function ConvertLeadDialog({
       leadId: lead.id!,
       clientId: createNewClient ? undefined : selectedClientId,
       createClient: createNewClient,
-      createContact
+      createContact,
     });
   };
 
@@ -91,11 +91,7 @@ export default function ConvertLeadDialog({
   const isLoading = convertMutation.isPending;
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      title="تحويل العميل المحتمل"
-    >
+    <Modal open={open} onClose={handleClose} title="تحويل العميل المحتمل">
       <div className="space-y-6">
         {/* Lead Info */}
         <div className="bg-gray-50 p-4 rounded-lg">
@@ -103,10 +99,9 @@ export default function ConvertLeadDialog({
           <div className="space-y-1 text-sm text-gray-600">
             <div>
               <span className="font-medium">الاسم:</span>{' '}
-              {lead.first_name && lead.last_name 
+              {lead.first_name && lead.last_name
                 ? `${lead.first_name} ${lead.last_name}`
-                : lead.first_name || lead.company || '-'
-              }
+                : lead.first_name || lead.company || '-'}
             </div>
             {lead.company && (
               <div>
@@ -147,7 +142,8 @@ export default function ConvertLeadDialog({
           {createNewClient ? (
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-800">
-                سيتم إنشاء عميل جديد باسم: <span className="font-medium">{lead.company || 'غير محدد'}</span>
+                سيتم إنشاء عميل جديد باسم:{' '}
+                <span className="font-medium">{lead.company || 'غير محدد'}</span>
               </p>
               {!lead.company && (
                 <p className="text-sm text-red-600 mt-2">
@@ -166,13 +162,13 @@ export default function ConvertLeadDialog({
                   className="pr-10"
                 />
               </div>
-              
+
               <Select
                 value={selectedClientId}
                 onChange={(e) => setSelectedClientId(e.target.value)}
               >
                 <option value="">اختر عميل موجود</option>
-                {clients.map(client => (
+                {clients.map((client) => (
                   <option key={client.id} value={client.id}>
                     {client.name}
                   </option>
@@ -194,7 +190,7 @@ export default function ConvertLeadDialog({
               إنشاء جهة اتصال من معلومات العميل المحتمل
             </label>
           </div>
-          
+
           {createContact && (
             <div className="bg-green-50 p-3 rounded text-sm text-green-800">
               سيتم إنشاء جهة اتصال جديدة بالمعلومات المتوفرة من العميل المحتمل
@@ -204,12 +200,7 @@ export default function ConvertLeadDialog({
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleClose}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="ghost" onClick={handleClose} disabled={isLoading}>
             إلغاء
           </Button>
           <Button

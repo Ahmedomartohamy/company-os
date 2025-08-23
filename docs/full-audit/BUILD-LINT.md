@@ -22,7 +22,7 @@
 
 ## Summary
 
-- **Lint Status:** 
-- **TypeScript Status:** 
-- **Build Status:** 
+- **Lint Status:**
+- **TypeScript Status:**
+- **Build Status:**
 - **Total Issues:**
