@@ -111,7 +111,7 @@ export default function ProjectsPage(){
           { key: "id", header: "إجراءات", render: (row) => (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={()=>requestEdit(row)}><Pencil className="w-4 h-4" /></Button>
-              <Button variant="danger" size="sm" onClick={()=>requestDelete(row)}><Trash2 className="w-4 h-4" /></Button>
+              <Button variant="destructive" size="sm" onClick={()=>requestDelete(row)}><Trash2 className="w-4 h-4" /></Button>
             </div>
           ) },
         ]}

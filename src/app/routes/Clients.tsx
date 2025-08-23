@@ -105,21 +105,31 @@ export default function ClientsPage(){
       <DataTable
         data={rows}
         columns={[
-          { key: "name", label: "اسم العميل" },
-          { key: "email", label: "البريد الإلكتروني" },
-          { key: "phone", label: "رقم الهاتف" },
-          { key: "company", label: "الشركة" },
-        ]}
-        actions={[
+          { key: "name", header: "الاسم" },
+          { key: "email", header: "البريد الإلكتروني" },
+          { key: "phone", header: "الهاتف" },
+          { key: "company", header: "الشركة" },
           {
-            icon: <Pencil className="w-4 h-4" />,
-            onClick: requestEdit,
-            variant: "secondary" as const,
-          },
-          {
-            icon: <Trash2 className="w-4 h-4" />,
-            onClick: requestDelete,
-            variant: "destructive" as const,
+            key: "id" as keyof Client,
+            header: "الإجراءات",
+            render: (client: Client) => (
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => requestEdit(client)}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => requestDelete(client)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ),
           },
         ]}
         loading={isLoading}

@@ -108,11 +108,11 @@ export default function TasksPage(){
           { key: "title", header: "العنوان" },
           { key: "assignee", header: "المسند إليه" },
           { key: "status", header: "الحالة" },
-          { key: "dueDate", header: "تاريخ الاستحقاق" },
+          { key: "due_date", header: "تاريخ الاستحقاق" },
           { key: "id", header: "إجراءات", render: (row) => (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={()=>requestEdit(row)}><Pencil className="w-4 h-4" /></Button>
-              <Button variant="danger" size="sm" onClick={()=>requestDelete(row)}><Trash2 className="w-4 h-4" /></Button>
+              <Button variant="destructive" size="sm" onClick={()=>requestDelete(row)}><Trash2 className="w-4 h-4" /></Button>
             </div>
           ) },
         ]}
