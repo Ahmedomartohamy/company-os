@@ -24,7 +24,7 @@ create table if not exists public.opportunities(
   contact_id uuid references public.contacts(id) on delete set null,
   name text not null,
   amount numeric(12,2) default 0,
-  currency text default 'USD',
+  currency text default 'EGP',
   pipeline_id uuid references public.pipelines(id) on delete set null,
   stage_id uuid references public.stages(id) on delete set null,
   owner_id uuid references auth.users(id) on delete set null,

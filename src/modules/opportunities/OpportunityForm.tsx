@@ -132,6 +132,7 @@ export function OpportunityForm({
 
   // Currency options
   const currencyOptions = [
+    { value: 'EGP', label: 'جنيه مصري (EGP)' },
     { value: 'SAR', label: 'ريال سعودي (SAR)' },
     { value: 'USD', label: 'دولار أمريكي (USD)' },
     { value: 'EUR', label: 'يورو (EUR)' }
@@ -221,7 +222,7 @@ export function OpportunityForm({
             label="العملة"
             placeholder="اختر العملة"
             options={currencyOptions}
-            defaultValue="SAR"
+            defaultValue="EGP"
             disabled={isLoading}
           />
         </div>

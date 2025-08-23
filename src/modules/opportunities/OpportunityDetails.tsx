@@ -84,9 +84,9 @@ export function OpportunityDetails() {
     }
   };
 
-  const formatCurrency = (amount?: number, currency = 'SAR') => {
+  const formatCurrency = (amount?: number, currency = 'EGP') => {
     if (!amount) return 'غير محدد';
-    return new Intl.NumberFormat('ar-SA', {
+    return new Intl.NumberFormat('ar-EG', {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 0,

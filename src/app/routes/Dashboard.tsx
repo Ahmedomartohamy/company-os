@@ -34,9 +34,9 @@ export default function Dashboard() {
 
   // Helper function to format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-SA', {
+    return new Intl.NumberFormat('ar-EG', {
       style: 'currency',
-      currency: 'SAR',
+      currency: 'EGP',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(amount);
